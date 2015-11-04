@@ -34,9 +34,10 @@ function split(inputstr, sep)
     return t
 end
 
+
+
 function scene:create( event )
 	local sceneGroup = self.view
-
 	
 	-- Called when the scene's view does not exist.
 	-- 
@@ -52,9 +53,11 @@ function scene:create( event )
 
 	local topBar = display.newRect( 160, 30, display.contentWidth, 65 )
 	topBar:setFillColor( 0.27, 0.65, 0.61 )
-	
+	selected = display.newRect( 160, 30, 160, 65 )
+	selected:setFillColor( 0.27, 0.75, 0.80 )
 	-- all objects must be added to group (e.g. self.view)
 	sceneGroup:insert(topBar)
+	sceneGroup:insert(selected)
 end
 
 function scene:show( event )
@@ -203,6 +206,7 @@ function scene:show( event )
 					end
 				else
 					print("model should be android")
+					local serviceName = event.target
 					local options = {
 						service = "share",
 						listener = socialPayment,
@@ -222,12 +226,13 @@ function scene:show( event )
 			if showingDetails == false then
 				showingDetails = true
 				local detailTable
-
+				-- Details rendering function
 				local function detailRender(event)
 					local row = event.row 
 					local params = row.params
 					local h = row.height / 2
 					local imgFilename = promo.id.. "_promo.png"
+					selected:setFillColor( 0.27, 0.65, 0.61 )
 
 					if params.image then
 						local imgBox = display.newRect( row, 160, 0, 320, 133 )
@@ -295,7 +300,6 @@ function scene:show( event )
 							local function goToRegister(event)
 								composer.gotoScene( "register", {params={prev="promos"}} )
 							end
-
 							local regBtn = display.newRoundedRect( row, 160, h - 10, 100, 30, 5 )
 							regBtn:setFillColor( 0.27, 0.65, 0.61  )
 							local regText = display.newText( row, "Ingresa", regBtn.x, regBtn.y, "Arial", 14 )
@@ -337,6 +341,7 @@ function scene:show( event )
 								scrolling = true
 								transition.to(detailTable, {time=300, x=480, onComplete=hideDetails})
 								transition.to(categoryMenu, {time=300, alpha = 1})
+								selected:setFillColor( 0.27, 0.70, 0.81 )
 							end
 						end
 					end
@@ -399,6 +404,7 @@ function scene:show( event )
 				for index, category in pairs(categoriesLuaTable) do
 
 					-- INSERT CATEGORY INTO MENU CATEGORY SCROLL
+
 					local menuItem = display.newText( categoryMenu, category, x, 40, "Arial", 16 )
 					x = x + 160
 
@@ -446,8 +452,8 @@ function scene:show( event )
    							end 
 						end
 
-
-						local short = display.newText( row, promo.short_description .. "...", 15, imgBg.height + 10, 285, 0, "Arial", 13 )
+						local printStringTitle = (promo.title < 72) and promo.title or string.sub(promo.title, 0, 72)
+						local short = display.newText( row, printStringTitle, 15, imgBg.height + 10, 285, 0, "Arial", 13 )
 						short:setFillColor( 0 )
 						short.anchorY = 0
 						short.anchorX = 0
@@ -561,8 +567,8 @@ function scene:show( event )
 								if promo.promo_count ~= nil then
 									promo.remainingPromos = promo.promo_max - promo.promo_count
 								end
-								local h = checkRowHeight(promo.short_description, "Arial", 13, 285) + baseHeight
-								promosTable:insertRow({rowHeight=checkRowHeight(promo.short_description .. "...", "Arial", 13, 280) + baseHeight, params={promo=promo, h=h}})
+								local h = checkRowHeight(promo.title, "Arial", 13, 285) + baseHeight
+								promosTable:insertRow({rowHeight=checkRowHeight(promo.title .. "...", "Arial", 13, 280) + baseHeight, params={promo=promo, h=h}})
 							end
 						end
 					end
