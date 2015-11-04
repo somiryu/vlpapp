@@ -446,8 +446,8 @@ function scene:show( event )
    							end 
 						end
 
-
-						local short = display.newText( row, promo.short_description .. "...", 15, imgBg.height + 10, 285, 0, "Arial", 13 )
+						local printString = (string.len(promo.title) < 72) and promo.title or string.sub(promo.title, 0, 72) .. "..."
+						local short = display.newText( row, printString, 15, imgBg.height + 10, 285, 0, "Arial", 13 )
 						short:setFillColor( 0 )
 						short.anchorY = 0
 						short.anchorX = 0
@@ -561,8 +561,8 @@ function scene:show( event )
 								if promo.promo_count ~= nil then
 									promo.remainingPromos = promo.promo_max - promo.promo_count
 								end
-								local h = checkRowHeight(promo.short_description, "Arial", 13, 285) + baseHeight
-								promosTable:insertRow({rowHeight=checkRowHeight(promo.short_description .. "...", "Arial", 13, 280) + baseHeight, params={promo=promo, h=h}})
+								local h = checkRowHeight(promo.title, "Arial", 13, 285) + baseHeight
+								promosTable:insertRow({rowHeight=checkRowHeight(promo.title .. "...", "Arial", 13, 280) + baseHeight, params={promo=promo, h=h}})
 							end
 						end
 					end
