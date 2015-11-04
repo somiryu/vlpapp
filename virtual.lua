@@ -30,8 +30,8 @@ function scene:create( event )
 	bg.anchorY = 0
 	bg:setFillColor( 1 )	-- white
 
-	local topBar = display.newRect( 160, 30, display.contentWidth, 65 )
-	topBar:setFillColor( 0.27, 0.65, 0.61 )
+	local topBar = display.newRect( 160, 75, display.contentWidth, 40 )
+	topBar:setFillColor( 0.94, 0.94, 0.94 )
 	
 	-- create some text
 
@@ -56,16 +56,16 @@ function scene:show( event )
 
 		mpspinner = widget.newSpinner( vlp.spinOpt )
 		mpspinner:start( )
-		mpspinner.x=160
+		mpspinner.x = 160
 		mpspinner.y = 240
 
 		virtualMarket = display.newGroup( )
 		sceneGroup:insert(virtualMarket)
 
 		local title = display.newText( sceneGroup, "Mercado Virtual", 0, 0, "Arial", 16 )
-		title:setFillColor( 1 )	-- white
+		title:setFillColor( 0.30 )	-- white
 		title.x = display.contentWidth * 0.5
-		title.y = 40
+		title.y = 75
 		getMarketPromos()
 	end	
 end
@@ -146,9 +146,10 @@ function scene:createTable(response)
 	local playerCoinIcon = display.newImageRect( sceneGroup, "coins_white.png", 15, 18 )
 	playerCoinIcon.anchorX = 1
 	playerCoinIcon.x = 310
-	playerCoinIcon.y = 40
+	playerCoinIcon.y = 75
 
-	local playerCoin = display.newText( sceneGroup, gold, playerCoinIcon.x - 25, 40, "Arial", 15 )
+	local playerCoin = display.newText( sceneGroup, gold, playerCoinIcon.x - 25, 75, "Arial", 15 )
+	playerCoin:setFillColor( 0.30 )
 	playerCoin.anchorX = 1
 
 
@@ -368,9 +369,9 @@ function scene:createTable(response)
 
 			local optionsTable = {
     			x = 480,
-    			y = 275,
+    			y = 265,
     			width = 320,
-    			height = 320,
+    			height = 340,
     			onRowRender = rowDetailRender,
     			listener = tableListener,
     			noLines = true
@@ -502,9 +503,9 @@ function scene:createTable(response)
 
 	local optionsTable = {
     		x = 158,
-    		y = 270,
+    		y = 265,
     		width = 320,
-    		height = 310,
+    		height = 340,
     		onRowRender = rowRender,
     		noLines = true
 	}

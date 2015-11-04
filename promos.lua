@@ -51,10 +51,10 @@ function scene:create( event )
 	bg:setFillColor( 1 )
 	sceneGroup:insert(bg)
 
-	local topBar = display.newRect( 160, 30, display.contentWidth, 65 )
-	topBar:setFillColor( 0.27, 0.65, 0.61 )
-	selected = display.newRect( 160, 30, 160, 65 )
-	selected:setFillColor( 0.27, 0.75, 0.80 )
+	local topBar = display.newRect( 160, 75, display.contentWidth, 40 )
+	topBar:setFillColor( 0.94, 0.94, 0.94 )
+	selected = display.newRect( 160, 75, 160, 40 )
+	selected:setFillColor( 0.79, 0.79, 0.79 )
 	-- all objects must be added to group (e.g. self.view)
 	sceneGroup:insert(topBar)
 	sceneGroup:insert(selected)
@@ -232,7 +232,7 @@ function scene:show( event )
 					local params = row.params
 					local h = row.height / 2
 					local imgFilename = promo.id.. "_promo.png"
-					selected:setFillColor( 0.27, 0.65, 0.61 )
+					selected:setFillColor( 0.94, 0.94, 0.94 )
 
 					if params.image then
 						local imgBox = display.newRect( row, 160, 0, 320, 133 )
@@ -341,7 +341,7 @@ function scene:show( event )
 								scrolling = true
 								transition.to(detailTable, {time=300, x=480, onComplete=hideDetails})
 								transition.to(categoryMenu, {time=300, alpha = 1})
-								selected:setFillColor( 0.27, 0.70, 0.81 )
+								selected:setFillColor( 0.79, 0.79, 0.79 )
 							end
 						end
 					end
@@ -349,9 +349,9 @@ function scene:show( event )
 
 				local optionsTable = {
     				x = 480,
-    				y = 275,
+    				y = 265,
     				width = 320,
-    				height = 320,
+    				height = 340,
     				onRowRender = detailRender,
     				listener = detailListener,
     				noLines = true
@@ -405,7 +405,8 @@ function scene:show( event )
 
 					-- INSERT CATEGORY INTO MENU CATEGORY SCROLL
 
-					local menuItem = display.newText( categoryMenu, category, x, 40, "Arial", 16 )
+					local menuItem = display.newText( categoryMenu, category, x, 75, "Roboto", 16 )
+					menuItem:setFillColor( 0.30 )
 					x = x + 160
 
 					local function rowRender(event)
@@ -424,7 +425,7 @@ function scene:show( event )
 						imgBg:setFillColor( 0.9 )
 
 						local categoryName = display.newText( row, promo.category, 160, imgBg.height / 2, "Arial", 14 )
-						categoryName:setFillColor( 0 )
+						categoryName:setFillColor( 0.30, 0.30, 0.30 )
 
 						if promo.mobile_photo ~= nil and promo.mobile_photo ~= "/images/original/missing.png" then
 							
@@ -535,7 +536,7 @@ function scene:show( event )
 					-- CREATE TABLE VIEW
 					local optionsTable = {
     					x = tableX,
-    					y = 285,
+    					y = 265,
     					width = 320,
     					height = 340,
     					onRowRender = rowRender,
