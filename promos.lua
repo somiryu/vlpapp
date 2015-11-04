@@ -452,7 +452,7 @@ function scene:show( event )
    							end 
 						end
 
-						local printStringTitle = (promo.title < 72) and promo.title or string.sub(promo.title, 0, 72)
+						local printStringTitle = (string.len(promo.title) < 72) and promo.title or string.sub(promo.title, 0, 72)
 						local short = display.newText( row, printStringTitle, 15, imgBg.height + 10, 285, 0, "Arial", 13 )
 						short:setFillColor( 0 )
 						short.anchorY = 0
