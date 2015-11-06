@@ -34,15 +34,16 @@ function split(inputstr, sep)
     return t
 end
 
+
+
 function scene:create( event )
 	local sceneGroup = self.view
 
-	
 	-- Called when the scene's view does not exist.
-	-- 
+	--
 	-- INSERT code here to initialize the scene
 	-- e.g. add display objects to 'sceneGroup', add touch listeners, etc.
-	
+
 	-- create a white background to fill screen
 	local bg = display.newRect( 0, 0, display.contentWidth, display.contentHeight )
 	bg.anchorX = 0
@@ -50,22 +51,24 @@ function scene:create( event )
 	bg:setFillColor( 1 )
 	sceneGroup:insert(bg)
 
-	local topBar = display.newRect( 160, 30, display.contentWidth, 65 )
-	topBar:setFillColor( 0.27, 0.65, 0.61 )
-	
+	local topBar = display.newRect( 160, 75, display.contentWidth, 40 )
+	topBar:setFillColor( 0.94, 0.94, 0.94 )
+	selected = display.newRect( 160, 75, 160, 40 )
+	selected:setFillColor( 0.79, 0.79, 0.79 )
 	-- all objects must be added to group (e.g. self.view)
 	sceneGroup:insert(topBar)
+	sceneGroup:insert(selected)
 end
 
 function scene:show( event )
 	local sceneGroup = self.view
 	local phase = event.phase
-	
+
 	if phase == "will" then
 		-- Called when the scene is still off screen and is about to move on screen
 	elseif phase == "did" then
 		-- Called when the scene is now on screen
-		-- 
+		--
 		-- INSERT code here to make the scene come alive
 		-- e.g. start timers, begin animation, play audio, etc.
 		--self.getPromos()
@@ -107,13 +110,13 @@ function scene:show( event )
 					print(event.action)
 
 					if event.action == "sent" or event.action == "cancelled" then
-						
+
 						-- CALL SEND VOUCHER API
 						local function voucherSent(event)
 							local text = ""
 							if event.isError then
 								text = "Error enviando"
-							else 
+							else
 								local response = json.decode(event.response)
 								text = response.status
 								if self.quedan[promoToSend] and response.new_qty then
@@ -161,7 +164,7 @@ function scene:show( event )
 							category:gsub("ú", "u")
 							category:lower()
 							if category == "salud_y_Belleza" then
-								category = "salud_belleza" 
+								category = "salud_belleza"
 							end
 
 							engine.send_accomplishment({player_id = engine.player_id, tag = "promo_"}, true)
@@ -170,15 +173,15 @@ function scene:show( event )
 
 						end
 
-						-- CALLING 
+						-- CALLING
 
 						--API BY NETWORK REQUEST
 						local url, headers = vlp.async("payment", {promo_id = promoToSend, id_in_engine = engine.player_id})
 						sending_voucher = network.request( url, "POST", voucherSent, {headers=headers} )
-						
+
 					end
 				end
-				
+
 				-- SOCIAL POPUP
 				if string.sub(system.getInfo( "model" ), 1, 2) == "iP" then
 					print("The model is Apple: use individual service")
@@ -198,11 +201,12 @@ function scene:show( event )
 						if event.target.img ~= nil then
 							options.image = {filename=event.target.img, baseDir=system.TemporaryDirectory }
 						end
-					
+
 						native.showPopup( "social", options )
 					end
 				else
 					print("model should be android")
+					local serviceName = event.target
 					local options = {
 						service = "share",
 						listener = socialPayment,
@@ -212,7 +216,7 @@ function scene:show( event )
 					if event.target.img ~= nil then
 						options.image = {filename=event.target.img, baseDir=system.TemporaryDirectory }
 					end
-					
+
 					native.showPopup( "social", options )
 				end
 			end
@@ -222,12 +226,13 @@ function scene:show( event )
 			if showingDetails == false then
 				showingDetails = true
 				local detailTable
-
+				-- Details rendering function
 				local function detailRender(event)
-					local row = event.row 
+					local row = event.row
 					local params = row.params
 					local h = row.height / 2
 					local imgFilename = promo.id.. "_promo.png"
+					selected:setFillColor( 0.94, 0.94, 0.94 )
 
 					if params.image then
 						local imgBox = display.newRect( row, 160, 0, 320, 133 )
@@ -236,13 +241,13 @@ function scene:show( event )
 
 						local path = system.pathForFile( imgFilename, system.TemporaryDirectory )
 						local f=io.open(path,"r")
-   						if f~=nil then 
-   							io.close(f) 
+   						if f~=nil then
+   							io.close(f)
    							local detailImage = display.newImage( row, imgFilename, system.TemporaryDirectory, imgBox.x, imgBox.y)
    							detailImage.anchorY = 0
    							detailImage.width = imgBox.width
    							detailImage.height = imgBox.height
-   						end 
+   						end
 					end
 
 					if params.remaining then
@@ -250,7 +255,7 @@ function scene:show( event )
 							self.quedanDetail[promo.id] = display.newText( row, "Quedan: "..promo.remainingPromos.." promo(s)", 160, h, "Arial", 14 )
 							--self.quedanDetail[promo.id].qty = promo.remainingPromos
 							self.quedanDetail[promo.id]:setFillColor( 0.4 )
-						else 
+						else
 							local remaining = display.newText( row, "Promo ilimitada", 160, h, "Arial", 14 )
 							remaining:setFillColor( 0.4 )
 						end
@@ -266,7 +271,7 @@ function scene:show( event )
 					if params.social then
 						if engine.player_id ~= nil then
 
-							local url = "http://vivelapromo.com/promo/"..promo.id 
+							local url = "http://vivelapromo.com/promo/"..promo.id
 							local text = "¡Compártela para Redimirla!"
 
 							local shareText = display.newText( {parent=row, text=text, x=90, y=h-10, width=130, height=0, font="Arial", fontSize=15, align="center"} )
@@ -285,17 +290,16 @@ function scene:show( event )
 							local twitterButton = display.newImageRect( row, "twitter_1.png", 40, 35 )
 							twitterButton.x = 258
 							twitterButton.y = h - 8
-							twitterButton.message = promo.twitter_message	
+							twitterButton.message = promo.twitter_message
 							twitterButton.url = url
 							twitterButton.img = imgFilename
 							twitterButton.social = "twitter"
 							twitterButton.promo_id = promo.id
 							twitterButton:addEventListener( "tap", socialActivate )
-						else 
+						else
 							local function goToRegister(event)
 								composer.gotoScene( "register", {params={prev="promos"}} )
 							end
-
 							local regBtn = display.newRoundedRect( row, 160, h - 10, 100, 30, 5 )
 							regBtn:setFillColor( 0.27, 0.65, 0.61  )
 							local regText = display.newText( row, "Ingresa", regBtn.x, regBtn.y, "Arial", 14 )
@@ -323,7 +327,7 @@ function scene:show( event )
 
 				local function detailListener(event)
 					if event.phase == "ended" then
-						local start = event.xStart							
+						local start = event.xStart
 
 						local function hideDetails(event)
 							showingDetails = false
@@ -337,6 +341,7 @@ function scene:show( event )
 								scrolling = true
 								transition.to(detailTable, {time=300, x=480, onComplete=hideDetails})
 								transition.to(categoryMenu, {time=300, alpha = 1})
+								selected:setFillColor( 0.79, 0.79, 0.79 )
 							end
 						end
 					end
@@ -344,9 +349,9 @@ function scene:show( event )
 
 				local optionsTable = {
     				x = 480,
-    				y = 275,
+    				y = 265,
     				width = 320,
-    				height = 320,
+    				height = 340,
     				onRowRender = detailRender,
     				listener = detailListener,
     				noLines = true
@@ -394,16 +399,18 @@ function scene:show( event )
 
 				sceneGroup:insert(categoryMenu)
 				sceneGroup:insert(categoryTables)
-				
-				
+
+
 				for index, category in pairs(categoriesLuaTable) do
 
 					-- INSERT CATEGORY INTO MENU CATEGORY SCROLL
-					local menuItem = display.newText( categoryMenu, category, x, 40, "Arial", 16 )
+
+					local menuItem = display.newText( categoryMenu, category, x, 75, "Roboto", 16 )
+					menuItem:setFillColor( 0.30 )
 					x = x + 160
 
 					local function rowRender(event)
-						local row = event.row 
+						local row = event.row
 						local promo = row.params.promo
 						local h = row.params.h
 
@@ -418,10 +425,10 @@ function scene:show( event )
 						imgBg:setFillColor( 0.9 )
 
 						local categoryName = display.newText( row, promo.category, 160, imgBg.height / 2, "Arial", 14 )
-						categoryName:setFillColor( 0 )
+						categoryName:setFillColor( 0.30, 0.30, 0.30 )
 
 						if promo.mobile_photo ~= nil and promo.mobile_photo ~= "/images/original/missing.png" then
-							
+
 							local function displayImg(event)
 								if event.phase == "ended" then
 									local image = display.newImage( row, event.response.filename, event.response.baseDirectory, 160, 1)
@@ -434,20 +441,20 @@ function scene:show( event )
 							local imgFilename = promo.id.."_promo.png"
 							local path = system.pathForFile( imgFilename, system.TemporaryDirectory )
 							local f=io.open(path,"r")
-   							if f~=nil then 
+   							if f~=nil then
    								io.close(f)
    								local detailImage = display.newImage( row, imgFilename, system.TemporaryDirectory, 160, 1)
    								detailImage.anchorY = 0
    								detailImage.width = 320
    								detailImage.height = 133
-   							else 
+   							else
    								self.images[promo.id] = network.download( promo.mobile_photo, "GET", displayImg, imgFilename, system.TemporaryDirectory )
 
-   							end 
+   							end
 						end
 
-						local printString = (string.len(promo.title) < 72) and promo.title or string.sub(promo.title, 0, 72) .. "..."
-						local short = display.newText( row, printString, 15, imgBg.height + 10, 285, 0, "Arial", 13 )
+						local printStringTitle = (string.len(promo.title) < 72) and promo.title or string.sub(promo.title, 0, 72)
+						local short = display.newText( row, printStringTitle, 15, imgBg.height + 10, 285, 0, "Arial", 13 )
 						short:setFillColor( 0 )
 						short.anchorY = 0
 						short.anchorX = 0
@@ -475,8 +482,8 @@ function scene:show( event )
 
 					local function tableListener(event)
 						local start = event.xStart
-						
-						if event.phase == "ended" and scrolling == false and showingDetails == false then							
+
+						if event.phase == "ended" and scrolling == false and showingDetails == false then
 
 							local function enableScrolling(event)
 								scrolling = false
@@ -490,7 +497,7 @@ function scene:show( event )
 								if event.x - start > 100 then
 									scrolling = true
 									if categoriesLuaTable[currentCat - 1] then
-										
+
 										currentCat = currentCat - 1
 
 										transition.to(categoryTables, {time=300, x=categoryTables.x + 320, onComplete=enableScrolling})
@@ -503,11 +510,11 @@ function scene:show( event )
 								if start - event.x > 100 then
 									scrolling = true
 									if categoriesLuaTable[currentCat + 1] then
-										
+
 										currentCat = currentCat + 1
 										transition.to(categoryTables, {time=300, x=categoryTables.x - 320, onComplete=enableScrolling})
 										transition.to(categoryMenu, {time=300, x=categoryMenu.x - 160})
-									else 
+									else
 										transition.to(categoryMenu, {time=200, x=categoryMenu.x - 40, onComplete=bounceBack()})
 									end
 								end
@@ -529,7 +536,7 @@ function scene:show( event )
 					-- CREATE TABLE VIEW
 					local optionsTable = {
     					x = tableX,
-    					y = 285,
+    					y = 265,
     					width = 320,
     					height = 340,
     					onRowRender = rowRender,
@@ -539,7 +546,7 @@ function scene:show( event )
 					tableX = tableX + 320
 					local promosTable = widget.newTableView( optionsTable )
 					categoryTables:insert(promosTable)
-					
+
 					local spinner = widget.newSpinner( vlp.spinOpt )
 					categoryTables:insert(spinner)
 					spinner:start()
@@ -578,13 +585,13 @@ function scene:show( event )
 
 		local get_url = vlp.async("promos")
 		self.getting_promos = network.request( get_url, "GET", getCategories, params )
-	end	
+	end
 end
 
 function scene:hide( event )
 	local sceneGroup = self.view
 	local phase = event.phase
-	
+
 	if event.phase == "will" then
 		-- Called when the scene is on screen and is about to move off screen
 		--
@@ -592,7 +599,7 @@ function scene:hide( event )
 		-- e.g. stop timers, stop animation, unload sounds, etc.)
 	elseif phase == "did" then
 		-- Called when the scene is now off screen
-		
+
 		if self.getting_promos then
 			network.cancel(self.getting_promos)
 		end
@@ -608,9 +615,9 @@ end
 
 function scene:destroy( event )
 	local sceneGroup = self.view
-	
+
 	-- Called prior to the removal of scene's "view" (sceneGroup)
-	-- 
+	--
 	-- INSERT code here to cleanup the scene
 	-- e.g. remove display objects, remove touch listeners, save state, etc.
 end

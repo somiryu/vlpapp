@@ -17,15 +17,15 @@ local fields = {}
 
 function scene:create( event )
 	local sceneGroup = self.view
-	
+
     self.prev = event.params.prev
-    
+
 
 	-- Called when the scene's view does not exist.
-	-- 
+	--
 	-- INSERT code here to initialize the scene
 	-- e.g. add display objects to 'sceneGroup', add touch listeners, etc.
-	
+
 	-- create a white background to fill screen
 	local bg = display.newRect( 0, 0, display.contentWidth, display.contentHeight )
 	bg.anchorX = 0
@@ -34,24 +34,24 @@ function scene:create( event )
 
     local topBar = display.newRect( 160, 30, display.contentWidth, 65 )
     topBar:setFillColor( 0.27, 0.65, 0.61 )
-    
+
 
 
 	-- all objects must be added to group (e.g. self.view)
 	sceneGroup:insert( bg )
-    sceneGroup:insert(topBar)    
-    
+    sceneGroup:insert(topBar)
+
 end
 
 function scene:show( event )
 	local sceneGroup = self.view
 	local phase = event.phase
-	
+
 	if phase == "will" then
 		-- Called when the scene is still off screen and is about to move on screen
 	elseif phase == "did" then
 		-- Called when the scene is now on screen
-		-- 
+		--
 		-- INSERT code here to make the scene come alive
 		-- e.g. start timers, begin animation, play audio, etc.
         transition.to(G_logo, {time=300, y=50})
@@ -74,7 +74,7 @@ function scene:show( event )
             scrollHeight = 340,
             listener = scrollListener,
             horizontalScrollDisabled = true,
-            backgroundColor = {0.27, 0.65, 0.61 }
+            backgroundColor = { 0.94 }
         }
 
         local scrollView = widget.newScrollView(scrollOptions)
@@ -92,16 +92,16 @@ function scene:show( event )
 
         local function textListener( event )
             if event.phase == "began" then
-                if event.target.isPassword  and event.target.isSecure == false then 
-                    event.target.isSecure = true 
+                if event.target.isPassword  and event.target.isSecure == false then
+                    event.target.isSecure = true
                     native.setKeyboardFocus( event.target )
                 end
             elseif event.phase == "ended" or event.phase == "submitted" then
                 errorMsg.alpha = 0
                 local text = event.target.text
-                local typeT = event.target.type 
-                if typeT == "Contraseña" then 
-                     typeT = "password" 
+                local typeT = event.target.type
+                if typeT == "Contraseña" then
+                     typeT = "password"
                      native.setKeyboardFocus( nil )
                  elseif typeT == "Usuario" then
                      typeT = "username"
@@ -127,7 +127,7 @@ function scene:show( event )
         end
 
         y = y + 28
-        
+
         loginBtn = display.newRoundedRect( 160, y, 170, 35, 5 )
         loginBtn:setFillColor( 0.09, 0.4, 0.38 )
         scrollView:insert(loginBtn)
@@ -156,35 +156,35 @@ function scene:show( event )
 
         local dontHaveText = display.newText( "¿NO TIENES CUENTA?", 160, y, "Arial", 14 )
         scrollView:insert(dontHaveText)
-        
+
         local returnToRegister = function(e)
             composer.gotoScene( "register", {params={ prev = self.prev }} )
         end
 
         dontHaveAccount:addEventListener( "tap", returnToRegister )
-	end	
+	end
 end
 
 function scene:hide( event )
 	local sceneGroup = self.view
 	local phase = event.phase
-	
+
 	if event.phase == "will" then
 		-- Called when the scene is on screen and is about to move off screen
 		--
 		-- INSERT code here to pause the scene
 		-- e.g. stop timers, stop animation, unload sounds, etc.)
         print(json.encode(fields))
-        for i, obj in pairs(fields) do  
+        for i, obj in pairs(fields) do
             obj:removeSelf()
-            obj = nil 
+            obj = nil
         end
         fields = nil
 
 
 	elseif phase == "did" then
 		-- Called when the scene is now off screen
-		transition.to(G_logo, {time=300, y=90})
+		transition.to(G_logo, {time=300, y=30})
         composer.removeScene( "login" )
 
 	end
@@ -192,9 +192,9 @@ end
 
 function scene:destroy( event )
 	local sceneGroup = self.view
-	
+
 	-- Called prior to the removal of scene's "view" (sceneGroup)
-	-- 
+	--
 	-- INSERT code here to cleanup the scene
 	-- e.g. remove display objects, remove touch listeners, save state, etc.
 end

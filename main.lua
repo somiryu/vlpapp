@@ -52,7 +52,7 @@ end
 -- LOGO
 G_logo = display.newImageRect( "logo.png", 200, 42)
 G_logo.x = 160
-G_logo.y = 90
+G_logo.y = 30
 
 
 -- create a tabBar widget with two buttons at the bottom of the screen
