@@ -60,9 +60,9 @@ G_logo.y = 45
 -- table to setup buttons
 local tabButtons = {
 	{ label="", labelYOffset = -8, defaultFile="promos.png", overFile="promos-down.png", width = 32, height = 30, onPress=promosView, selected=true },
-	{ label="", labelYOffset = -8, defaultFile="virtual-down.png", overFile="virtual.png", width = 30, height = 27, onPress=virtualView },
+	{ label="", labelYOffset = -8, defaultFile="virtual.png", overFile="virtual-down.png", width = 30, height = 27, onPress=virtualView },
 	{ label="", labelYOffset = -8, defaultFile="missions.png", overFile="missions-down.png", width = 32, height = 30, onPress=missionsView },
-	{ label="", labelYOffset = 0, defaultFile="account-down.png", overFile="account.png", width = 32, height = 28, onPress=accountView },
+	{ label="", labelYOffset = 0, defaultFile="account.png", overFile="account-down.png", width = 32, height = 28, onPress=accountView },
 }
 
 -- create the actual tabBar widget
@@ -70,11 +70,11 @@ local tabBar = widget.newTabBar{
 	top = display.contentHeight - 45,	-- 50 is default height for tabBar widget
 	buttons = tabButtons,
 	backgroundFile = "tabBarBG.png",
-    tabSelectedLeftFile = "tabBarBG.png",
-    tabSelectedRightFile = "tabBarBG.png",
-    tabSelectedMiddleFile = "tabBarBG.png",
-    tabSelectedFrameWidth = 40,
-    tabSelectedFrameHeight = 120,
+    tabSelectedLeftFile = "tabBarSelectedBG.png",
+    tabSelectedRightFile = "tabBarSelectedBG.png",
+    tabSelectedMiddleFile = "tabBarSelectedBG.png",
+    tabSelectedFrameWidth = 32,
+    tabSelectedFrameHeight = 45,
 }
 
 
