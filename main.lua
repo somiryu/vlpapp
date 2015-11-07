@@ -52,7 +52,7 @@ end
 -- LOGO
 G_logo = display.newImageRect( "logo.png", 200, 42)
 G_logo.x = 160
-G_logo.y = 30
+G_logo.y = 45
 
 
 -- create a tabBar widget with two buttons at the bottom of the screen
@@ -68,7 +68,13 @@ local tabButtons = {
 -- create the actual tabBar widget
 local tabBar = widget.newTabBar{
 	top = display.contentHeight - 45,	-- 50 is default height for tabBar widget
-	buttons = tabButtons
+	buttons = tabButtons,
+	backgroundFile = "tabBarBG.png",
+    tabSelectedLeftFile = "tabBarBG.png",
+    tabSelectedRightFile = "tabBarBG.png",
+    tabSelectedMiddleFile = "tabBarBG.png",
+    tabSelectedFrameWidth = 40,
+    tabSelectedFrameHeight = 120,
 }
 
 

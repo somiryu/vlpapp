@@ -51,9 +51,9 @@ function scene:create( event )
 	bg:setFillColor( 1 )
 	sceneGroup:insert(bg)
 
-	local topBar = display.newRect( 160, 75, display.contentWidth, 40 )
+	local topBar = display.newRect( 160, 90, display.contentWidth, 40 )
 	topBar:setFillColor( 0.94, 0.94, 0.94 )
-	selected = display.newRect( 160, 75, 160, 40 )
+	selected = display.newRect( 160, 90, 160, 40 )
 	selected:setFillColor( 0.79, 0.79, 0.79 )
 	-- all objects must be added to group (e.g. self.view)
 	sceneGroup:insert(topBar)
@@ -144,6 +144,7 @@ function scene:show( event )
 								overlayGroup = nil
 
 								local currScene = composer.getSceneName( "current" )
+								composer.removeScene( currScene )
 								composer.gotoScene( currScene )
 							end
 
@@ -405,7 +406,7 @@ function scene:show( event )
 
 					-- INSERT CATEGORY INTO MENU CATEGORY SCROLL
 
-					local menuItem = display.newText( categoryMenu, category, x, 75, "Roboto", 16 )
+					local menuItem = display.newText( categoryMenu, category, x, 90, "Roboto", 16 )
 					menuItem:setFillColor( 0.30 )
 					x = x + 160
 
@@ -536,9 +537,9 @@ function scene:show( event )
 					-- CREATE TABLE VIEW
 					local optionsTable = {
     					x = tableX,
-    					y = 265,
+    					y = 272.5,
     					width = 320,
-    					height = 340,
+    					height = 325,
     					onRowRender = rowRender,
     					listener = tableListener,
     					noLines = true
