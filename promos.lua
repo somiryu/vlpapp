@@ -12,7 +12,7 @@ local engine = require("engine")
 local vlp = require("vlp")
 
 local promo_id
-local showingDetails = false
+local showingDetails
 
 scene.categories = {}
 
@@ -72,7 +72,7 @@ function scene:show( event )
 		-- INSERT code here to make the scene come alive
 		-- e.g. start timers, begin animation, play audio, etc.
 		--self.getPromos()
-		local showDetails = false
+		local showingDetails = false
 		local scrolling = false
 		local params = {}
 		local headers = {}
@@ -201,7 +201,9 @@ function scene:show( event )
 						end
 
 						native.showPopup( "social", options )
+						
 					end
+
 				else
 					print("model should be android")
 					local serviceName = event.target
@@ -210,6 +212,10 @@ function scene:show( event )
 						listener = socialPayment,
 						url = event.target.url
 					}
+
+					if event.target.social == "twitter" then
+						options.message = event.target.twitter
+					end
 
 					if event.target.img ~= nil then
 						options.image = {filename=event.target.img, baseDir=system.TemporaryDirectory }
@@ -223,7 +229,7 @@ function scene:show( event )
 			-- SHOW DETAILS TABLE RENDER AND LISTENER
 			if showingDetails == false then
 				showingDetails = true
-				local detailTable
+
 				-- Details rendering function
 				local function detailRender(event)
 					local row = event.row
@@ -329,16 +335,16 @@ function scene:show( event )
 
 						local function hideDetails(event)
 							showingDetails = false
-							detailTable:removeSelf( )
-							detailTable = nil
+							self.detailTable:removeSelf( )
+							self.detailTable = nil
 							scrolling = false
 						end
 
 						if event.x > start then
 							if event.x - start > 100 then
 								scrolling = true
-								transition.to(detailTable, {time=300, x=480, onComplete=hideDetails})
-								transition.to(categoryMenu, {time=300, alpha = 1})
+								transition.to(self.detailTable, {time=300, x=480, onComplete=hideDetails})
+								transition.to(self.categoryMenu, {time=300, alpha = 1})
 								selected:setFillColor( 0.79, 0.79, 0.79 )
 							end
 						end
@@ -347,32 +353,32 @@ function scene:show( event )
 
 				local optionsTable = {
     				x = 480,
-    				y = 265,
+    				y = 272,
     				width = 320,
-    				height = 340,
+    				height = 326,
     				onRowRender = detailRender,
     				listener = detailListener,
     				noLines = true
 				}
-				detailTable = widget.newTableView( optionsTable )
-				sceneGroup:insert(detailTable)
+				self.detailTable = widget.newTableView( optionsTable )
+				sceneGroup:insert(self.detailTable)
 
-				detailTable:insertRow( {rowHeight=133, params={image = true}} )
-				detailTable:insertRow( {rowHeight=30, params={remaining = true}} )
-				detailTable:insertRow( {rowHeight=checkRowHeight(promo.short_description, "Gotham Light", 12, 285), params={block = promo.short_description}} )
-				detailTable:insertRow( {rowHeight=50, params={social = true}} )
-				detailTable:insertRow( {rowHeight=25, params={title="DESCRIPCIÓN"}} )
-				detailTable:insertRow( {rowHeight=checkRowHeight(promo.long_description, "Gotham Light", 12, 285), params={block = promo.long_description}} )
-				detailTable:insertRow( {rowHeight=25, params={title="CONDICIONES"}} )
-				detailTable:insertRow( {rowHeight=checkRowHeight(promo.conditions, "Gotham Light", 12, 285), params={block = promo.conditions}} )
-				detailTable:insertRow( {rowHeight=25, params={title="ASOCIADO"}} )
-				detailTable:insertRow( {rowHeight=checkRowHeight(promo.associate.name, "Gotham Book", 12, 285) - 10, params={associate = promo.associate.name}} )
-				detailTable:insertRow( {rowHeight=checkRowHeight(promo.associate.address, "Gotham Book", 12, 285) - 10, params={associate = promo.associate.address}} )
-				detailTable:insertRow( {rowHeight=checkRowHeight(promo.associate.phone, "Gotham Book", 12, 285) - 10, params={associate = promo.associate.phone}} )
-				detailTable:insertRow( {rowHeight=checkRowHeight(promo.associate.website, "Gotham Book", 12, 285) - 10, params={associate = promo.associate.website, openUrl=true}} )
+				self.detailTable:insertRow( {rowHeight=133, params={image = true}} )
+				self.detailTable:insertRow( {rowHeight=30, params={remaining = true}} )
+				self.detailTable:insertRow( {rowHeight=checkRowHeight(promo.short_description, "Gotham Light", 12, 285), params={block = promo.short_description}} )
+				self.detailTable:insertRow( {rowHeight=50, params={social = true}} )
+				self.detailTable:insertRow( {rowHeight=25, params={title="DESCRIPCIÓN"}} )
+				self.detailTable:insertRow( {rowHeight=checkRowHeight(promo.long_description, "Gotham Light", 12, 285), params={block = promo.long_description}} )
+				self.detailTable:insertRow( {rowHeight=25, params={title="CONDICIONES"}} )
+				self.detailTable:insertRow( {rowHeight=checkRowHeight(promo.conditions, "Gotham Light", 12, 285), params={block = promo.conditions}} )
+				self.detailTable:insertRow( {rowHeight=25, params={title="ASOCIADO"}} )
+				self.detailTable:insertRow( {rowHeight=checkRowHeight(promo.associate.name, "Gotham Book", 12, 285) - 10, params={associate = promo.associate.name}} )
+				self.detailTable:insertRow( {rowHeight=checkRowHeight(promo.associate.address, "Gotham Book", 12, 285) - 10, params={associate = promo.associate.address}} )
+				self.detailTable:insertRow( {rowHeight=checkRowHeight(promo.associate.phone, "Gotham Book", 12, 285) - 10, params={associate = promo.associate.phone}} )
+				self.detailTable:insertRow( {rowHeight=checkRowHeight(promo.associate.website, "Gotham Book", 12, 285) - 10, params={associate = promo.associate.website, openUrl=true}} )
 
-				transition.to(detailTable, {time=300, x=160, onComplete=hideDetails})
-				transition.to(categoryMenu, {time=300, alpha = 0})
+				transition.to(self.detailTable, {time=300, x=160, onComplete=hideDetails})
+				transition.to(self.categoryMenu, {time=300, alpha = 0})
 			end
 
 
@@ -600,16 +606,25 @@ function scene:hide( event )
 		if self.getting_promos then
 			network.cancel(self.getting_promos)
 		end
-		for index, request in pairs(self.requests) do
-			network.cancel( request )
+		if self.requests then
+			for index, request in pairs(self.requests) do
+				network.cancel( request )
+			end
 		end
-		for index, image in pairs(self.images) do
-			network.cancel( image )
+		if self.images then
+			for index, image in pairs(self.images) do
+				network.cancel( image )
+			end
 		end
 
 		if self.categoryMenu then
 			self.categoryMenu:removeSelf( )
 			self.categoryMenu = nil
+		end
+
+		if self.detailTable then
+			self.detailTable:removeSelf( )
+			self.detailTable = nil
 		end
 	end
 end
