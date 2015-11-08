@@ -137,14 +137,20 @@ function scene:show( event )
         scrollView:insert(logText)
 
         local submitLogin = function(e)
-            answer = vlp.call("users/login", "POST", data)
-            if answer.status ~= "ok" then
-                errorMsg.alpha = 1
-                errorMsg.text = answer.status
-            else
-                engine.player_id = engine.getPlayerId(answer.id_in_engine)
-                composer.gotoScene( self.prev )
+            loginBtn.alpha = 0
+
+            local function go(e)
+                answer = vlp.call("users/login", "POST", data)
+                if answer.status ~= "ok" then
+                    loginBtn.alpha = 1
+                    errorMsg.alpha = 1
+                    errorMsg.text = answer.status
+                else
+                    engine.player_id = engine.getPlayerId(answer.id_in_engine)
+                    composer.gotoScene( self.prev )
+                end
             end
+            timer.performWithDelay( 50, go, 1 )
         end
 
         loginBtn:addEventListener( "tap", submitLogin )

@@ -74,8 +74,6 @@ function scene:show( event )
 		--self.getPromos()
 		local showDetails = false
 		local scrolling = false
-		local categoriesTable
-		local categoryMenu
 		local params = {}
 		local headers = {}
 		headers["Authorization"] = "Token token=F2pR0cks"
@@ -126,6 +124,7 @@ function scene:show( event )
 							end
 
 							local overlayGroup = display.newGroup( )
+							sceneGroup:insert(overlayGroup)
 
 							local overLay = display.newRoundedRect( 160, 240, 300, 120, 10 )
 							overLay:setFillColor( 1 )
@@ -140,8 +139,6 @@ function scene:show( event )
 							local btnMsg = display.newText( "Cerrar", button.x, button.y-3, "Roboto", 15 )
 
 							local function reload (event)
-								overlayGroup:removeSelf( )
-								overlayGroup = nil
 
 								local currScene = composer.getSceneName( "current" )
 								composer.removeScene( currScene )
@@ -303,7 +300,7 @@ function scene:show( event )
 							end
 							local regBtn = display.newRoundedRect( row, 160, h - 10, 100, 30, 5 )
 							regBtn:setFillColor( 0.27, 0.65, 0.61  )
-							local regText = display.newText( row, "Ingresa", regBtn.x, regBtn.y, "Roboto", 14 )
+							local regText = display.newText( row, "Ingresa", regBtn.x, regBtn.y-3, "Roboto", 14 )
 							regBtn:addEventListener( "tap", goToRegister )
 						end
 					end
@@ -389,23 +386,23 @@ function scene:show( event )
 				spinnerMain = nil
 
 				categoriesLuaTable = json.decode(event.response)
-				print(json.encodecategoru)
 
-				categoryMenu = display.newGroup( )
-				local categoryTables = display.newGroup( )
+				self.categoryMenu = display.newGroup( )
+
+				self.categoryTables = display.newGroup( )
 				local currentCat = 1
 				local x = 160
 				local tableX = 160
 
-				sceneGroup:insert(categoryMenu)
-				sceneGroup:insert(categoryTables)
+				sceneGroup:insert(self.categoryMenu)
+				sceneGroup:insert(self.categoryTables)
 
 
 				for index, category in pairs(categoriesLuaTable) do
 
 					-- INSERT CATEGORY INTO MENU CATEGORY SCROLL
 
-					local menuItem = display.newText( categoryMenu, string.sub(category, 0, 5) == "Salud" and "Salud" or category, x, 88, "Roboto", 15 )
+					local menuItem = display.newText( self.categoryMenu, string.sub(category, 0, 5) == "Salud" and "Salud" or category, x, 88, "Roboto", 15 )
 					menuItem:setFillColor( 0.30 )
 					x = x + 160
 
@@ -490,7 +487,7 @@ function scene:show( event )
 							end
 
 							local function bounceBack()
-								transition.to(categoryMenu, {time=200, x=categoryMenu.x, delay=200, onComplete=enableScrolling})
+								transition.to(self.categoryMenu, {time=200, x=self.categoryMenu.x, delay=200, onComplete=enableScrolling})
 							end
 
 							if event.x > start then
@@ -500,10 +497,10 @@ function scene:show( event )
 
 										currentCat = currentCat - 1
 
-										transition.to(categoryTables, {time=300, x=categoryTables.x + 320, onComplete=enableScrolling})
-										transition.to(categoryMenu, {time=300, x=categoryMenu.x + 160})
+										transition.to(self.categoryTables, {time=300, x=self.categoryTables.x + 320, onComplete=enableScrolling})
+										transition.to(self.categoryMenu, {time=300, x=self.categoryMenu.x + 160})
 									else
-										transition.to(categoryMenu, {time=200, x=categoryMenu.x + 40, onComplete=bounceBack()})
+										transition.to(self.categoryMenu, {time=200, x=self.categoryMenu.x + 40, onComplete=bounceBack()})
 									end
 								end
 							elseif event.x < start then
@@ -512,10 +509,10 @@ function scene:show( event )
 									if categoriesLuaTable[currentCat + 1] then
 
 										currentCat = currentCat + 1
-										transition.to(categoryTables, {time=300, x=categoryTables.x - 320, onComplete=enableScrolling})
-										transition.to(categoryMenu, {time=300, x=categoryMenu.x - 160})
+										transition.to(self.categoryTables, {time=300, x=self.categoryTables.x - 320, onComplete=enableScrolling})
+										transition.to(self.categoryMenu, {time=300, x=self.categoryMenu.x - 160})
 									else
-										transition.to(categoryMenu, {time=200, x=categoryMenu.x - 40, onComplete=bounceBack()})
+										transition.to(self.categoryMenu, {time=200, x=self.categoryMenu.x - 40, onComplete=bounceBack()})
 									end
 								end
 							end
@@ -530,7 +527,7 @@ function scene:show( event )
 					sceneGroup:insert(bgw)
 					bgw:toBack()
 
-					categoryMenu:addEventListener( "touch", tableListener )
+					self.categoryMenu:addEventListener( "touch", tableListener )
 					bgw:addEventListener( "touch", tableListener )
 
 					-- CREATE TABLE VIEW
@@ -545,10 +542,10 @@ function scene:show( event )
 					}
 					tableX = tableX + 320
 					local promosTable = widget.newTableView( optionsTable )
-					categoryTables:insert(promosTable)
+					self.categoryTables:insert(promosTable)
 
 					local spinner = widget.newSpinner( vlp.spinOpt )
-					categoryTables:insert(spinner)
+					self.categoryTables:insert(spinner)
 					spinner:start()
 					spinner.y = 240
 					spinner.x = promosTable.x
@@ -609,7 +606,11 @@ function scene:hide( event )
 		for index, image in pairs(self.images) do
 			network.cancel( image )
 		end
-		composer.removeScene( "promos" )
+
+		if self.categoryMenu then
+			self.categoryMenu:removeSelf( )
+			self.categoryMenu = nil
+		end
 	end
 end
 

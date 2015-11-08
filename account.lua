@@ -134,7 +134,7 @@ function scene:show( event )
 						network.cancel(self.avatar_img)
 						self.avatar_img = nil
 					end
-        			composer.gotoScene( "promos" )
+        			composer.gotoScene( "account" )
         		end
 
         		logoff:addEventListener( "tap", logOff )

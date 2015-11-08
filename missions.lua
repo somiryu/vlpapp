@@ -17,6 +17,7 @@ local timer_2
 local timer_3
 local timer_4
 
+
 function scene:create( event )
 	local sceneGroup = self.view
 
@@ -50,6 +51,7 @@ function scene:show( event )
 		--
 		-- INSERT code here to make the scene come alive
 		-- e.g. start timers, begin animation, play audio, etc.
+
 		if not engine.player_id then
             composer.gotoScene( "register", {params={prev="missions"}}  )
         else
@@ -128,6 +130,7 @@ function scene:show( event )
 						if seconds == 0 then
     						timer.cancel(event.source)
     						local currScene = composer.getSceneName( "current" )
+                            composer.removeScene( currScene )
 							composer.gotoScene( currScene )
     					else
 							event.source.remaining = event.source.remaining - 1
@@ -147,7 +150,8 @@ function scene:show( event )
     					if params.mina.mission.cooldown_active == false then
 
     						local function sendAccomplishment(event)
-    							local acc = event.target
+                                print("SENDING ACC")
+    						  	local acc = event.target
     							local tag = acc.tag
 
     							acc:removeSelf( )
@@ -233,7 +237,6 @@ function scene:show( event )
     				end
 
     				if params.description then
-    					print("TUTORIAL MISSION")
     					local name = display.newText( row, params.name, 15, 19, 280, 0, "Roboto", 17 )
     					name:setFillColor( 0 )
     					name.anchorX = 0
@@ -283,23 +286,23 @@ function scene:show( event )
     				noLines = true
 				}
 
-				missionTable = widget.newTableView( optionsMissionTable )
-				sceneGroup:insert( missionTable )
+				self.missionTable = widget.newTableView( optionsMissionTable )
+				sceneGroup:insert( self.missionTable )
 
 
 				print("START TABLE")
-				missionTable:insertRow( {rowHeight=50, isCategory=true, params={title="MINA DE ORO"}} )
+				self.missionTable:insertRow( {rowHeight=50, isCategory=true, params={title="MINA DE ORO"}} )
 
 				for mineType, mine in pairs(mina['missions']) do
-					missionTable:insertRow({rowHeight=50, params={mina=mine, mineType=mineType}})
+					self.missionTable:insertRow({rowHeight=50, params={mina=mine, mineType=mineType}})
 				end
 
-				missionTable:insertRow( {rowHeight=50, isCategory=true, params={title="MISIONES"}} )
+				self.missionTable:insertRow( {rowHeight=50, isCategory=true, params={title="MISIONES"}} )
 
 				if tutorial['missions'] then
 					for tag, mission in pairs(tutorial['missions']) do
 						mission = mission.mission
-						missionTable:insertRow( {rowHeight=checkRowHeight(mission.description, "Gotham Light", 13, 280) + 60, params={name=mission.name, description=mission.description, rewards=mission.rewards}} )
+						self.missionTable:insertRow( {rowHeight=checkRowHeight(mission.description, "Gotham Light", 13, 280) + 60, params={name=mission.name, description=mission.description, rewards=mission.rewards}} )
 					end
 				end
 				print("END TABLE")
@@ -348,8 +351,10 @@ function scene:hide( event )
 			timer.cancel(timer_4)
 		end
 
-        composer.removeScene( "missions" )
-
+        if self.missionTable then
+            self.missionTable:removeSelf( )
+            self.missionTable = nil
+        end
 	end
 end
 
@@ -360,6 +365,10 @@ function scene:destroy( event )
 	--
 	-- INSERT code here to cleanup the scene
 	-- e.g. remove display objects, remove touch listeners, save state, etc.
+    if self.missionTable then
+        self.missionTable:removeSelf( )
+        self.missionTable = nil
+    end
 end
 
 ---------------------------------------------------------------------------------
