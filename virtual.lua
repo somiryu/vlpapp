@@ -240,6 +240,7 @@ function scene:createTable(response)
 
 							local function payCoins(event)
 								overlayGroup = display.newGroup( )
+								sceneGroup:insert(overlayGroup)
 
 								local overLay = display.newRoundedRect( 160, 240, 300, 120, 10 )
 								overLay:setFillColor( 1 )
@@ -272,10 +273,9 @@ function scene:createTable(response)
 								local btnMsg = display.newText( "Cerrar", button.x, button.y - 3, "Roboto", 15 )
 
 								local function reload (event)
-									overlayGroup:removeSelf( )
-									overlayGroup = nil
 
 									local currScene = composer.getSceneName( "current" )
+									composer.removeScene( currScene )
 									composer.gotoScene( currScene )
 								end
 
