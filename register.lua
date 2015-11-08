@@ -237,7 +237,7 @@ function scene:hide( event )
 
 	elseif phase == "did" then
 		-- Called when the scene is now off screen
-		transition.to(G_logo, {time=300, y=30})
+		transition.to(G_logo, {time=300, y=45})
         composer.removeScene( "register" )
 
 	end

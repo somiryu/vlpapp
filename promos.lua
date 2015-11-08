@@ -406,7 +406,7 @@ function scene:show( event )
 
 					-- INSERT CATEGORY INTO MENU CATEGORY SCROLL
 
-					local menuItem = display.newText( categoryMenu, category, x, 90, "Roboto", 16 )
+					local menuItem = display.newText( categoryMenu, string.sub(category, 0, 5) == "Salud" and "Salud" or category, x, 90, "Roboto", 16 )
 					menuItem:setFillColor( 0.30 )
 					x = x + 160
 
