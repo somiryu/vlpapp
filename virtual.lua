@@ -62,10 +62,10 @@ function scene:show( event )
 		virtualMarket = display.newGroup( )
 		sceneGroup:insert(virtualMarket)
 
-		local title = display.newText( sceneGroup, "Mercado Virtual", 0, 0, "Arial", 16 )
+		local title = display.newText( sceneGroup, "Mercado Virtual", 0, 0, "Roboto", 16 )
 		title:setFillColor( 0.30 )	-- white
 		title.x = display.contentWidth * 0.5
-		title.y = 90
+		title.y = 86
 		getMarketPromos()
 	end	
 end
@@ -148,7 +148,7 @@ function scene:createTable(response)
 	playerCoinIcon.x = 310
 	playerCoinIcon.y = 90
 
-	local playerCoin = display.newText( sceneGroup, gold, playerCoinIcon.x - 25, 90, "Arial", 15 )
+	local playerCoin = display.newText( sceneGroup, gold, playerCoinIcon.x - 25, 90, "Roboto", 15 )
 	playerCoin:setFillColor( 0.30 )
 	playerCoin.anchorX = 1
 
@@ -184,8 +184,8 @@ function scene:createTable(response)
 					y = row.height / 2,
 					width = 160,
 					height = 0,
-					font = "Arial",
-					fontSize = 16,
+					font = "Gotham Light",
+					fontSize = 14,
 					align = "center"
 				}
 			
@@ -215,18 +215,18 @@ function scene:createTable(response)
 				end
 				if params['remaining'] then
 					local remainingT = "Quedan " .. params['remaining'] .. " promo(s)"
-					local remaining = display.newText( row, remainingT, 160, row.height * 0.5, "Arial", 14 )
+					local remaining = display.newText( row, remainingT, 160, row.height * 0.5, "Roboto", 14 )
 					remaining:setFillColor( 0 )
 				end
 				if params['short'] then
 					local shortT = params['short']
-					local short = display.newText( row, shortT, 160, row.height * 0.5, 300, 0, "Arial", 13 )
+					local short = display.newText( row, shortT, 160, row.height * 0.5, 300, 0, "Gotham Light", 12 )
 					short:setFillColor( 0.3 )
 				end
 				
 				
 				if params['payment'] then
-					local price = display.newText( row, params.payment, 75, row.height / 2, "Arial", 14 )
+					local price = display.newText( row, params.payment, 75, row.height / 2 - 3, "Roboto", 14 )
 					price.anchorX = 0
 					price:setFillColor( 0.2 )
 
@@ -264,12 +264,12 @@ function scene:createTable(response)
 								}	
 								response = json.decode(response[1])
 
-								local msgR = display.newText( response.status, overLay.x, overLay.y - 27, 250, 0, "Arial", 16 )
+								local msgR = display.newText( response.status, overLay.x, overLay.y - 27, 250, 0, "Gotham Light", 14 )
 								msgR:setFillColor( 0.1 )
 
 								local button = display.newRoundedRect( 160, 270, 120, 32, 5 )
 								button:setFillColor(  0.27, 0.65, 0.61  )
-								local btnMsg = display.newText( "Cerrar", button.x, button.y, "Arial", 15 )
+								local btnMsg = display.newText( "Cerrar", button.x, button.y - 3, "Roboto", 15 )
 
 								local function reload (event)
 									overlayGroup:removeSelf( )
@@ -307,7 +307,7 @@ function scene:createTable(response)
     						button.id = params.id
     						row:insert( button )
 						else 
-							local getMore = display.newText( row, "Consigue más monedas", 200, row.height / 2, "Arial", 13 )
+							local getMore = display.newText( row, "Consigue más monedas", 200, row.height / 2 - 3, "Roboto", 13 )
 							getMore:setFillColor( 0.3 )
 						end
 					else 
@@ -317,7 +317,7 @@ function scene:createTable(response)
 
 						local regBtn = display.newRoundedRect( row, 200, row.height / 2 , 100, 30, 5 )
 						regBtn:setFillColor( 0.27, 0.65, 0.61  )
-						local regText = display.newText( row, "Ingresa", regBtn.x, regBtn.y, "Arial", 14 )
+						local regText = display.newText( row, "Ingresa", regBtn.x, regBtn.y - 3, "Roboto", 14 )
 						regBtn:addEventListener( "tap", goToRegister )
 					end
 				end 
@@ -328,12 +328,15 @@ function scene:createTable(response)
 				textOptions.width = 290
 
 				if params['title'] then
+					textOptions.font = "Roboto"
 					textOptions.text = params['title']
 					textOptions.y = row.height * 0.8
 					local long_title = display.newText( textOptions )
 					long_title:setFillColor( 0.2 )
 				end
 				if params['block'] then
+					textOptions.font = "Gotham Light"
+					textOptions.fontSize = 12
 					textOptions.text = params['block']
 					textOptions.y = row.height * 0.5
 					local longT = display.newText( textOptions )
@@ -341,7 +344,7 @@ function scene:createTable(response)
 				end
 				if params['column'] then
 					local text = params['column'] .. params['cell']
-					local infoText = display.newText( row, text, 160, row.height/2, "Arial", 14 )
+					local infoText = display.newText( row, text, 160, row.height/2, "Gotham Book", 12 )
 					infoText:setFillColor( 0.27, 0.65, 0.61 )
 					if params['listen'] then
 						infoText:addEventListener( "tap", openURL )
@@ -384,17 +387,17 @@ function scene:createTable(response)
 			promosDetail:insertRow({rowHeight=133, params={isBox=true}})
 			promosDetail:insertRow({rowHeight=23, params={remaining=thisPromo.promo_qty}})
 		
-			promosDetail:insertRow({rowHeight=checkRowHeight(thisPromo.short_description, "Arial", 13, 300), params={short=thisPromo.short_description}})
+			promosDetail:insertRow({rowHeight=checkRowHeight(thisPromo.short_description, "Gotham Light", 12, 300), params={short=thisPromo.short_description}})
 			--social
 			promosDetail:insertRow( {rowHeight=50, params={payment=price, id=thisPromo.id}} )
 			--description
-			promosDetail:insertRow( {rowHeight=25, params={title="DESCRIPCIÓN:"}} )
-			promosDetail:insertRow({rowHeight=checkRowHeight(thisPromo.long_description, "Arial", 13, 300), params={block=thisPromo.long_description}})
+			promosDetail:insertRow( {rowHeight=35, params={title="DESCRIPCIÓN:"}} )
+			promosDetail:insertRow({rowHeight=checkRowHeight(thisPromo.long_description, "Gotham Light", 12, 300)+3, params={block=thisPromo.long_description}})
 			--conditions
-			promosDetail:insertRow( {rowHeight=25, params={title="CONDICIONES:"}} )
-			promosDetail:insertRow({rowHeight=checkRowHeight(thisPromo.conditions, "Arial", 13, 300), params={block=thisPromo.conditions}})
+			promosDetail:insertRow( {rowHeight=30, params={title="CONDICIONES:"}} )
+			promosDetail:insertRow({rowHeight=checkRowHeight(thisPromo.conditions, "Gotham Light", 12, 300), params={block=thisPromo.conditions}})
 			--Associate
-			promosDetail:insertRow( {rowHeight=25, params={title="NUESTRO ASOCIADO:"}} )
+			promosDetail:insertRow( {rowHeight=30, params={title="NUESTRO ASOCIADO:"}} )
 			local associate = thisPromo['associate']
 			promosDetail:insertRow( {rowHeight=25, params={column="", cell=associate['name']}} )
 			promosDetail:insertRow( {rowHeight=20, params={column="Tel: ", cell=associate['phone'], listen=associate['phone']}} )
@@ -468,17 +471,17 @@ function scene:createTable(response)
 				y = 160,
 				width = 300,
 				height = 20,
-				font = "Arial",
-				fontSize = 14,
+				font = "Gotham Light",
+				fontSize = 12,
 				align = "left"
 			}
 
-		local short = display.newText( row, promo.short_description, 15, backBox.height + 10, 285, 0, "Arial", 13 )
+		local short = display.newText( row, promo.short_description, 15, backBox.height + 10, 285, 0, "Gotham Light", 11 )
 		short:setFillColor( 0 )
 		short.anchorX = 0
 		short.anchorY = 0
 
-		local priceText = display.newText( row, "Precio: "..price, 15, row.height - 20, "Arial", 14 )
+		local priceText = display.newText( row, "Precio: "..price, 15, row.height - 20, "Roboto", 14 )
 		priceText.anchorX = 0
 		priceText.anchorY = 1
 		priceText:setFillColor( 0 )
@@ -489,7 +492,7 @@ function scene:createTable(response)
 		coinIcon.x = priceText.width + 20
 		coinIcon.y = priceText.y
 
-		local qty = display.newText( row, "Quedan: ".. promo.promo_qty, row.width - 20, row.height - 20, "Arial", 14 )
+		local qty = display.newText( row, "Quedan: ".. promo.promo_qty, row.width - 20, row.height - 20, "Roboto", 14 )
 		qty:setFillColor( 0.4 )
 		qty.anchorX = 1
 		qty.anchorY = 1
@@ -515,7 +518,7 @@ function scene:createTable(response)
 
 	-- Insert Rows
 	for index, promo in pairs(response) do
-		marketPromos:insertRow({rowHeight=checkRowHeight(promo.short_description .. "...", "Arial", 13, 280) + baseHeight, params={promo=promo, gold=gold, level=level, lvls_achieved=lvls_achieved}})
+		marketPromos:insertRow({rowHeight=checkRowHeight(promo.short_description .. "...", "Gotham Light", 11, 280) + baseHeight, params={promo=promo, gold=gold, level=level, lvls_achieved=lvls_achieved}})
 	end
 end
 

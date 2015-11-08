@@ -84,22 +84,22 @@ function scene:show( event )
 
         local scrollView = widget.newScrollView(scrollOptions)
 
-        local title = display.newText( "Regístrate", 160, 100, "Arial", 16 )
-        title:setFillColor( 1  )
+        local title = display.newText( "Regístrate", 160, 100, "Roboto", 16 )
+        title:setFillColor( 0.3  )
         scrollView:insert(title)
         sceneGroup:insert(scrollView)
 
-        local passErrorMsg = display.newText("Las contraseñas no son iguales.", 160, 290, "Arial", 15)
+        local passErrorMsg = display.newText("Las contraseñas no son iguales.", 160, 290, "Gotham Light", 13)
         passErrorMsg:setFillColor( 1,0,0 )
         passErrorMsg.alpha = 0
         scrollView:insert(passErrorMsg)
 
-        local mailErrorMsg = display.newText("Has ingresado un email inválido.", 160, 290, "Arial", 15)
+        local mailErrorMsg = display.newText("Has ingresado un email inválido.", 160, 290, "Gotham Light", 13)
         mailErrorMsg:setFillColor( 1,0,0 )
         mailErrorMsg.alpha = 0
         scrollView:insert(mailErrorMsg)
 
-        local answerErrorMsg = display.newText("", 160, 290, "Arial", 15)
+        local answerErrorMsg = display.newText("", 160, 290, "Gotham Light", 13)
         answerErrorMsg:setFillColor( 1,0,0 )
         answerErrorMsg.alpha = 0
         scrollView:insert(answerErrorMsg)
@@ -184,6 +184,7 @@ function scene:show( event )
             fields[i] = native.newTextField( 160, y, 250, 30 )
             fields[i]:addEventListener( "userInput", textListener )
             fields[i].type = field
+            fields[i].font = native.newFont("Gotham Light", 13)
             fields[i].placeholder = field
 
             if field == "Contraseña" or field == "Confirma la contraseña" then
@@ -200,7 +201,7 @@ function scene:show( event )
         registerBtn:setFillColor( 0.09, 0.4, 0.38 )
         registerBtn.alpha = 0.5
         scrollView:insert(registerBtn)
-        local regText = display.newText( "Regístrate", 160, y, "Arial", 14 )
+        local regText = display.newText( "Regístrate", 160, y-3, "Roboto", 14 )
 		scrollView:insert(regText)
 
         y = y + 40
@@ -208,7 +209,7 @@ function scene:show( event )
         haveAccount:setFillColor( 0.09, 0.4, 0.38 )
         scrollView:insert(haveAccount)
 
-        local haveText = display.newText( "¿YA TIENES CUENTA?", 160, y, "Arial", 14 )
+        local haveText = display.newText( "¿YA TIENES CUENTA?", 160, y-3, "Roboto", 14 )
         scrollView:insert(haveText)
 
         local showLogin = function(e)

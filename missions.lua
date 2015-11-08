@@ -82,7 +82,7 @@ function scene:show( event )
 				playerCoinIcon.x = 310
 				playerCoinIcon.y = 90
 
-				local playerCoin = display.newText( sceneGroup, gold, playerCoinIcon.x - 25, 90, "Arial", 15 )
+				local playerCoin = display.newText( sceneGroup, gold, playerCoinIcon.x - 25, 88, "Roboto", 15 )
 				playerCoin:setFillColor( 0.30 )
 				playerCoin.anchorX = 1
 
@@ -135,7 +135,7 @@ function scene:show( event )
 					end
 
     				if params['title'] then
-        				local title = display.newText( row, params['title'], 160, row.height / 2, "Arial", 16 )
+        				local title = display.newText( row, params['title'], 160, row.height / 2, "Roboto", 16 )
         				title:setFillColor( 0.2 )
         			end
 
@@ -192,7 +192,7 @@ function scene:show( event )
         					barBg:setFillColor( 0.78, 0.78, 0.78 )
 
         					-- TIME TEXT
-							local text = display.newText( row, "Cargando...", 280, (row.height / 2) + 15, "Arial", 12 )
+							local text = display.newText( row, "Cargando...", 280, (row.height / 2) + 12, "Roboto", 12 )
     						text:setFillColor( 0.4 )
     						text.anchorX = 1
     						text.textShow = true
@@ -234,20 +234,20 @@ function scene:show( event )
 
     				if params.description then
     					print("TUTORIAL MISSION")
-    					local name = display.newText( row, params.name, 15, 19, 280, 0, "Arial", 17 )
+    					local name = display.newText( row, params.name, 15, 19, 280, 0, "Roboto", 17 )
     					name:setFillColor( 0 )
     					name.anchorX = 0
 
-						local description = display.newText( row, params.description, 18, row.height / 2, 280, 0, "Arial", 15 )
+						local description = display.newText( row, params.description, 18, row.height / 2, 280, 0, "Gotham Light", 13 )
     					description:setFillColor( 0.2 )
     					description.anchorX = 0
 
     					local rightMargin = 280
     					for tag, curr in pairs(params.rewards.currencies) do
-    						print(json.encode(curr))
-    						local thisCurr = display.newText( row, curr.quantity, rightMargin, row.height -22, "Arial", 16 )
+    						local thisCurr = display.newText( row, curr.quantity, rightMargin, row.height, "Roboto", 16 )
     						thisCurr:setFillColor( 0.1 )
     						thisCurr.anchorX = 1
+                            thisCurr.anchorY = 1
     						rightMargin = rightMargin - 10 - thisCurr.width
 
     						local img
@@ -259,8 +259,9 @@ function scene:show( event )
     							img = display.newImageRect( row, "caja_sorpresa.png", 21, 18 )
     						end
     						img.anchorX = 1
+                            img.anchorY = 1
     						img.x = rightMargin
-    						img.y = thisCurr.y
+    						img.y = thisCurr.y - 3
     						rightMargin = rightMargin - 15 - img.width
     					end
 
@@ -298,7 +299,7 @@ function scene:show( event )
 				if tutorial['missions'] then
 					for tag, mission in pairs(tutorial['missions']) do
 						mission = mission.mission
-						missionTable:insertRow( {rowHeight=checkRowHeight(mission.description, "Arial", 15, 280) + 60, params={name=mission.name, description=mission.description, rewards=mission.rewards}} )
+						missionTable:insertRow( {rowHeight=checkRowHeight(mission.description, "Gotham Light", 13, 280) + 60, params={name=mission.name, description=mission.description, rewards=mission.rewards}} )
 					end
 				end
 				print("END TABLE")

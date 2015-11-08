@@ -132,12 +132,12 @@ function scene:show( event )
 							overLay:setStrokeColor( 0.2 )
 							overLay.strokeWidth = 2
 
-							local msgR = display.newText( text, overLay.x, overLay.y - 27, 250, 0, "Arial", 16 )
+							local msgR = display.newText( text, overLay.x, overLay.y - 27, 250, 0, "Gotham Light", 14 )
 							msgR:setFillColor( 0.1 )
 
 							local button = display.newRoundedRect( 160, 270, 120, 32, 5 )
 							button:setFillColor(  0.27, 0.65, 0.61  )
-							local btnMsg = display.newText( "Cerrar", button.x, button.y, "Arial", 15 )
+							local btnMsg = display.newText( "Cerrar", button.x, button.y-3, "Roboto", 15 )
 
 							local function reload (event)
 								overlayGroup:removeSelf( )
@@ -253,17 +253,17 @@ function scene:show( event )
 
 					if params.remaining then
 						if promo.remainingPromos then
-							self.quedanDetail[promo.id] = display.newText( row, "Quedan: "..promo.remainingPromos.." promo(s)", 160, h, "Arial", 14 )
+							self.quedanDetail[promo.id] = display.newText( row, "Quedan: "..promo.remainingPromos.." promo(s)", 160, h, "Roboto", 14 )
 							--self.quedanDetail[promo.id].qty = promo.remainingPromos
 							self.quedanDetail[promo.id]:setFillColor( 0.4 )
 						else
-							local remaining = display.newText( row, "Promo ilimitada", 160, h, "Arial", 14 )
+							local remaining = display.newText( row, "Promo ilimitada", 160, h, "Roboto", 14 )
 							remaining:setFillColor( 0.4 )
 						end
 					end
 
 					if params.block then
-						local short = display.newText( row, params.block, 15, 5, 285, 0, "Arial", 14 )
+						local short = display.newText( row, params.block, 15, 5, 285, 0, "Gotham Light", 12 )
 						short:setFillColor( 0.2 )
 						short.anchorX = 0
 						short.anchorY = 0
@@ -275,7 +275,7 @@ function scene:show( event )
 							local url = "http://vivelapromo.com/promo/"..promo.id
 							local text = "¡Compártela para Redimirla!"
 
-							local shareText = display.newText( {parent=row, text=text, x=90, y=h-10, width=130, height=0, font="Arial", fontSize=15, align="center"} )
+							local shareText = display.newText( {parent=row, text=text, x=90, y=h-10, width=130, height=0, font="Roboto", fontSize=15, align="center"} )
 							shareText:setFillColor(0.4)
 
 							local socialButton = display.newImageRect( row, "facebook_1.png", 40, 35 )
@@ -303,20 +303,20 @@ function scene:show( event )
 							end
 							local regBtn = display.newRoundedRect( row, 160, h - 10, 100, 30, 5 )
 							regBtn:setFillColor( 0.27, 0.65, 0.61  )
-							local regText = display.newText( row, "Ingresa", regBtn.x, regBtn.y, "Arial", 14 )
+							local regText = display.newText( row, "Ingresa", regBtn.x, regBtn.y, "Roboto", 14 )
 							regBtn:addEventListener( "tap", goToRegister )
 						end
 					end
 
 					if params.title then
-						local title = display.newText( row, params.title, 15, 5, 285, 0, "Arial", 14 )
+						local title = display.newText( row, params.title, 15, 5, 285, 0, "Roboto", 14 )
 						title:setFillColor( 0 )
 						title.anchorX = 0
 						title.anchorY = 0
 					end
 
 					if params.associate then
-						local associate = display.newText( {parent=row, text=params.associate, x=160, y=h, width=280, height=0, font="Arial", fontSize=14, align="center"} )
+						local associate = display.newText( {parent=row, text=params.associate, x=160, y=h, width=280, height=0, font="Gotham Book", fontSize=12, align="center"} )
 						associate:setFillColor(0.27, 0.65, 0.61 )
 						if params.openUrl then
 							associate.url = params.associate
@@ -362,17 +362,17 @@ function scene:show( event )
 
 				detailTable:insertRow( {rowHeight=133, params={image = true}} )
 				detailTable:insertRow( {rowHeight=30, params={remaining = true}} )
-				detailTable:insertRow( {rowHeight=checkRowHeight(promo.short_description, "Arial", 14, 285), params={block = promo.short_description}} )
+				detailTable:insertRow( {rowHeight=checkRowHeight(promo.short_description, "Gotham Light", 12, 285), params={block = promo.short_description}} )
 				detailTable:insertRow( {rowHeight=50, params={social = true}} )
-				detailTable:insertRow( {rowHeight=20, params={title="DESCRIPCIÓN"}} )
-				detailTable:insertRow( {rowHeight=checkRowHeight(promo.long_description, "Arial", 14, 285), params={block = promo.long_description}} )
-				detailTable:insertRow( {rowHeight=20, params={title="CONDICIONES"}} )
-				detailTable:insertRow( {rowHeight=checkRowHeight(promo.conditions, "Arial", 14, 285), params={block = promo.conditions}} )
-				detailTable:insertRow( {rowHeight=20, params={title="ASOCIADO"}} )
-				detailTable:insertRow( {rowHeight=checkRowHeight(promo.associate.name, "Arial", 14, 285) - 10, params={associate = promo.associate.name}} )
-				detailTable:insertRow( {rowHeight=checkRowHeight(promo.associate.address, "Arial", 14, 285) - 10, params={associate = promo.associate.address}} )
-				detailTable:insertRow( {rowHeight=checkRowHeight(promo.associate.phone, "Arial", 14, 285) - 10, params={associate = promo.associate.phone}} )
-				detailTable:insertRow( {rowHeight=checkRowHeight(promo.associate.website, "Arial", 14, 285) - 10, params={associate = promo.associate.website, openUrl=true}} )
+				detailTable:insertRow( {rowHeight=25, params={title="DESCRIPCIÓN"}} )
+				detailTable:insertRow( {rowHeight=checkRowHeight(promo.long_description, "Gotham Light", 12, 285), params={block = promo.long_description}} )
+				detailTable:insertRow( {rowHeight=25, params={title="CONDICIONES"}} )
+				detailTable:insertRow( {rowHeight=checkRowHeight(promo.conditions, "Gotham Light", 12, 285), params={block = promo.conditions}} )
+				detailTable:insertRow( {rowHeight=25, params={title="ASOCIADO"}} )
+				detailTable:insertRow( {rowHeight=checkRowHeight(promo.associate.name, "Gotham Book", 12, 285) - 10, params={associate = promo.associate.name}} )
+				detailTable:insertRow( {rowHeight=checkRowHeight(promo.associate.address, "Gotham Book", 12, 285) - 10, params={associate = promo.associate.address}} )
+				detailTable:insertRow( {rowHeight=checkRowHeight(promo.associate.phone, "Gotham Book", 12, 285) - 10, params={associate = promo.associate.phone}} )
+				detailTable:insertRow( {rowHeight=checkRowHeight(promo.associate.website, "Gotham Book", 12, 285) - 10, params={associate = promo.associate.website, openUrl=true}} )
 
 				transition.to(detailTable, {time=300, x=160, onComplete=hideDetails})
 				transition.to(categoryMenu, {time=300, alpha = 0})
@@ -385,7 +385,6 @@ function scene:show( event )
 
 		local function getCategories(event)
 			if not event.isError then
-				print("NO ERROR GETTING CATEGORIES")
 				spinnerMain:removeSelf( )
 				spinnerMain = nil
 
@@ -406,7 +405,7 @@ function scene:show( event )
 
 					-- INSERT CATEGORY INTO MENU CATEGORY SCROLL
 
-					local menuItem = display.newText( categoryMenu, string.sub(category, 0, 5) == "Salud" and "Salud" or category, x, 90, "Roboto", 16 )
+					local menuItem = display.newText( categoryMenu, string.sub(category, 0, 5) == "Salud" and "Salud" or category, x, 88, "Roboto", 15 )
 					menuItem:setFillColor( 0.30 )
 					x = x + 160
 
@@ -425,7 +424,7 @@ function scene:show( event )
 						imgBg.anchorY = 0
 						imgBg:setFillColor( 0.9 )
 
-						local categoryName = display.newText( row, promo.category, 160, imgBg.height / 2, "Arial", 14 )
+						local categoryName = display.newText( row, promo.category, 160, imgBg.height / 2, "Roboto", 14 )
 						categoryName:setFillColor( 0.30, 0.30, 0.30 )
 
 						if promo.mobile_photo ~= nil and promo.mobile_photo ~= "/images/original/missing.png" then
@@ -454,14 +453,14 @@ function scene:show( event )
    							end
 						end
 
-						local printStringTitle = (string.len(promo.title) < 72) and promo.title or string.sub(promo.title, 0, 72)
-						local short = display.newText( row, printStringTitle, 15, imgBg.height + 10, 285, 0, "Arial", 13 )
+						local printStringTitle = (string.len(promo.title) < 90) and promo.title or string.sub(promo.title, 0, 86)
+						local short = display.newText( row, printStringTitle, 15, imgBg.height + 10, 285, 0, "Gotham Light", 11 )
 						short:setFillColor( 0 )
 						short.anchorY = 0
 						short.anchorX = 0
 
 						if promo.remainingPromos then
-							self.quedan[promo.id] = display.newText( row, "Quedan: " .. promo.remainingPromos, 15, bgBox.height - 10, "Arial", 14 )
+							self.quedan[promo.id] = display.newText( row, "Quedan: " .. promo.remainingPromos, 15, bgBox.height - 10, "Roboto", 14 )
 							self.quedan[promo.id].anchorX = 0
 							self.quedan[promo.id].anchorY = 1
 							self.quedan[promo.id]:setFillColor( 0.3 )
@@ -474,7 +473,7 @@ function scene:show( event )
 							if id == 3 then return "GRATIS" end
 						end
 
-						local priceText = display.newText( row, getPriceTitle(promo.price_title_id, promo.price), 305, bgBox.height - 10, "Arial", 16 )
+						local priceText = display.newText( row, getPriceTitle(promo.price_title_id, promo.price), 305, bgBox.height - 10, "Roboto", 16 )
         				priceText:setFillColor( 0.27, 0.65, 0.61 )
         				priceText.anchorX = 1
         				priceText.anchorY = 1
@@ -569,8 +568,8 @@ function scene:show( event )
 								if promo.promo_count ~= nil then
 									promo.remainingPromos = promo.promo_max - promo.promo_count
 								end
-								local h = checkRowHeight(promo.title, "Arial", 13, 285) + baseHeight
-								promosTable:insertRow({rowHeight=checkRowHeight(promo.title .. "...", "Arial", 13, 280) + baseHeight, params={promo=promo, h=h}})
+								local h = checkRowHeight(promo.title, "Gotham Light", 11, 285) + baseHeight
+								promosTable:insertRow({rowHeight=checkRowHeight(promo.title .. "...", "Gotham Light", 11, 280) + baseHeight, params={promo=promo, h=h}})
 							end
 						end
 					end

@@ -15,7 +15,7 @@ local avatarBg
 local getting_lb
 scene.avatars = {}
 
-local leaderboardTag = display.newText( "Tabla de Líderes  >", 310, 40, "Arial", 15 )
+local leaderboardTag = display.newText( "Tabla de Líderes  >", 310, 37, "Roboto", 15 )
 leaderboardTag.anchorX = 1
 
 
@@ -23,7 +23,7 @@ leaderboardTag.anchorX = 1
 function scene:create( event )
 	local sceneGroup = self.view
 
-	local bg = display.newRect( 0, 0, display.contentWidth, display.contentHeight )
+	local bg = display.newRect( 0, 0, display.contentWidth * 2, display.contentHeight )
 	bg.anchorX = 0
 	bg.anchorY = 0
 	bg:setFillColor( 1 )	-- white
@@ -106,9 +106,9 @@ function scene:show( event )
 
 				self.avatar_img = network.download( avatar, "GET", avatarLoader, player_info.name.."_avatar.png", system.TemporaryDirectory )
 				
-				local player_name = display.newText( sceneGroup, string.upper(player_info['name']), 160, 310, "Arial", 17 )
+				local player_name = display.newText( sceneGroup, string.upper(player_info['name']), 160, 310, "Roboto", 17 )
 				player_name:setFillColor(0)
-				local level_name = display.newText( sceneGroup, level['level_name'], 160, 330, "Arial", 15 )
+				local level_name = display.newText( sceneGroup, level['level_name'], 160, 330, "Roboto", 15 )
 				level_name:setFillColor( 0.3 )
 
 				local barBg = display.newRect( sceneGroup, 70, 350, 180, 7 )
@@ -119,13 +119,13 @@ function scene:show( event )
         		barBg:setFillColor( 0.78, 0.78, 0.78 )
         		barFg:setFillColor( 0.3, 0.3, 0.3 )
 
-        		local goldText = display.newText( sceneGroup, gold, 140, 380, "Arial", 17 )
+        		local goldText = display.newText( sceneGroup, gold, 140, 380, "Roboto", 17 )
         		goldText:setFillColor( 0.3 )
         		local goldImg = display.newImageRect( sceneGroup, "coins.png", 24, 20 )
         		goldImg.x = 180
         		goldImg.y = 380
 
-        		local logoff = display.newText( sceneGroup, "Cerrar Sesión", 160, 410, "Arial", 16 )
+        		local logoff = display.newText( sceneGroup, "Cerrar Sesión", 160, 410, "Roboto", 16 )
         		logoff:setFillColor( 0.27, 0.65, 0.61 )
 
         		local function logOff(event)
@@ -151,7 +151,7 @@ function scene:show( event )
         	local params = event.row.params
 
 		    if params['title'] then
-        		local title = display.newText( row, params['title'], 160, row.height / 2, "Arial", 16 )
+        		local title = display.newText( row, params['title'], 160, row.height / 2 - 3, "Roboto", 16 )
         		title:setFillColor( 0.2 )
 		    end
 
@@ -165,7 +165,7 @@ function scene:show( event )
 
         	if params['player'] then
         		local player = params['player']
-        		local position = display.newText( row, player['position']..".", 35, row.height / 2, "Arial", 15 )
+        		local position = display.newText( row, player['position']..".", 35, row.height / 2 - 3, "Roboto", 15 )
         		position:setFillColor( 0 )
         		position.anchorX = 1
         		
@@ -182,11 +182,11 @@ function scene:show( event )
         		self.avatars[player['position']] = network.download( player['player']['avatar'], "GET", modifyAvatar, player['position'].."_leaderboard.png", system.TemporaryDirectory )
 
         		-- Player Info
-        		local playerName = display.newText( row, player['player']['name'], 120, 20, "Arial", 15 )
+        		local playerName = display.newText( row, player['player']['name'], 120, 17, "Roboto", 15 )
         		playerName:setFillColor( 0.1 )
         		playerName.anchorX = 0
 
-        		local playerLevel = display.newText( row, player['player']['levels']['xp']['name'], 120, 40, "Arial", 15 )
+        		local playerLevel = display.newText( row, player['player']['levels']['xp']['name'], 120, 37, "Roboto", 15 )
         		playerLevel:setFillColor( 0.3 )
         		playerLevel.anchorX = 0
 

@@ -79,12 +79,12 @@ function scene:show( event )
 
         local scrollView = widget.newScrollView(scrollOptions)
 
-        local title = display.newText( "Ingresa", 160, 100, "Arial", 16 )
-        title:setFillColor( 1  )
+        local title = display.newText( "Ingresa", 160, 100, "Roboto", 14 )
+        title:setFillColor( 0.3  )
         scrollView:insert(title)
         sceneGroup:insert(scrollView)
 
-        local errorMsg = display.newText("", 160, 210, "Arial", 15)
+        local errorMsg = display.newText("", 160, 210, "Gotham Light", 13)
         errorMsg:setFillColor( 1,0,0 )
         errorMsg.alpha = 0
         scrollView:insert(errorMsg)
@@ -118,6 +118,7 @@ function scene:show( event )
             fields[i] = native.newTextField( 160, y, 250, 30 )
             fields[i]:addEventListener( "userInput", textListener )
             fields[i].type = field
+            fields[i].font = native.newFont("Gotham Light", 13)
             fields[i].placeholder = field
 
             local secure = false
@@ -132,7 +133,7 @@ function scene:show( event )
         loginBtn:setFillColor( 0.09, 0.4, 0.38 )
         scrollView:insert(loginBtn)
 
-        local logText = display.newText( "Ingresa", 160, y, "Arial", 14 )
+        local logText = display.newText( "Ingresa", 160, y-3, "Roboto", 14 )
         scrollView:insert(logText)
 
         local submitLogin = function(e)
@@ -154,7 +155,7 @@ function scene:show( event )
         dontHaveAccount:setFillColor( 0.09, 0.4, 0.38 )
         scrollView:insert(dontHaveAccount)
 
-        local dontHaveText = display.newText( "¿NO TIENES CUENTA?", 160, y, "Arial", 14 )
+        local dontHaveText = display.newText( "¿NO TIENES CUENTA?", 160, y-3, "Roboto", 14 )
         scrollView:insert(dontHaveText)
 
         local returnToRegister = function(e)
