@@ -11,6 +11,7 @@ local json = require("json")
 local widget = require("widget")
 local vlp = require("vlp")
 local ga = require("GoogleAnalytics.ga")
+local utils = require("utils")
 
 local fields = {}
 local data = {}
@@ -122,15 +123,17 @@ function scene:show( event )
                 local text = event.target.text
                 local typeT = event.target.type
                 if typeT == "Usuario" then
-                    native.setKeyboardFocus( fields[2] )
+                    --native.setKeyboardFocus( fields[2] )
                 elseif typeT == "Email" then
-                    native.setKeyboardFocus( fields[3] )
+                    --native.setKeyboardFocus( fields[3] )
                 elseif typeT == "Contraseña"  then
                     typeT = "password"
-                    native.setKeyboardFocus( fields[4] )
+                    --native.setKeyboardFocus( fields[4] )
                 elseif typeT == "Confirma la contraseña" then
                     typeT = "confirm"
-                    native.setKeyboardFocus( nil )
+                    --native.setKeyboardFocus( nil )
+                elseif typeT == "Código Promotor" then
+                    typeT = "p_code"
                 end
 
                 if typeT == "Email" then
@@ -169,6 +172,8 @@ function scene:show( event )
                         e.target.alpha = 0
                         
                         local function go(e)
+                            utils.print_r(data)
+                            
                             answer = vlp.call("users", "POST", data)
                             if answer.status ~= "ok" then
                                 answerErrorMsg.alpha = 1
@@ -188,7 +193,7 @@ function scene:show( event )
             end
         end
 
-        local fieldToDraw = {"Usuario", "Email", "Contraseña", "Confirma la contraseña"}
+        local fieldToDraw = {"Usuario", "Email", "Contraseña", "Confirma la contraseña", "Código Promotor"}
         local y = 140
         for i, field in pairs(fieldToDraw) do
             fields[i] = native.newTextField( 160, y, 250, 30 )
