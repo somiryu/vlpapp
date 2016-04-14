@@ -12,6 +12,7 @@ local engine = require("engine")
 local http = require("socket.http")
 local ltn12 = require( "ltn12" )
 local vlp = require("vlp")
+local ga = require("GoogleAnalytics.ga")
 
 
 local mpspinner
@@ -32,14 +33,17 @@ function scene:create( event )
 
 	local topBar = display.newRect( 160, 90, display.contentWidth, 40 )
 	topBar:setFillColor( 0.94, 0.94, 0.94 )
-	
-	-- create some text
-
-	
-
 	-- all objects must be added to group (e.g. self.view)
 	sceneGroup:insert( bg )
 	sceneGroup:insert(topBar)
+	-- create some text
+	local title = display.newText( sceneGroup, "Mercado Virtual", 0, 0, "Roboto", 16 )
+	title:setFillColor( 0.30 )	-- white
+	title.x = display.contentWidth * 0.5
+	title.y = 86
+	
+
+	
 end
 
 function scene:show( event )
@@ -48,7 +52,9 @@ function scene:show( event )
 	
 	if phase == "will" then
 		-- Called when the scene is still off screen and is about to move on screen
+		ga.enterScene("Virtual Market")
 	elseif phase == "did" then
+		print("SHOWING")
 		-- Called when the scene is now on screen
 		-- 
 		-- INSERT code here to make the scene come alive
@@ -62,10 +68,7 @@ function scene:show( event )
 		virtualMarket = display.newGroup( )
 		sceneGroup:insert(virtualMarket)
 
-		local title = display.newText( sceneGroup, "Mercado Virtual", 0, 0, "Roboto", 16 )
-		title:setFillColor( 0.30 )	-- white
-		title.x = display.contentWidth * 0.5
-		title.y = 86
+		
 		getMarketPromos()
 	end	
 end
@@ -79,13 +82,13 @@ function scene:hide( event )
 		--
 		-- INSERT code here to pause the scene
 		-- e.g. stop timers, stop animation, unload sounds, etc.)
-	elseif phase == "did" then
-		-- Called when the scene is now off screen
-
 		if mpspinner then
 			mpspinner:removeSelf()
 			mpspinner = nil
 		end
+
+		virtualMarket:removeSelf( )
+		virtualMarket = nil
 
 		if self.images then
 			for i, image in pairs(self.images) do
@@ -93,7 +96,24 @@ function scene:hide( event )
 			end
 		end
 
-		composer.removeScene( "virtual" )
+		if self.playerCoinIcon then
+			self.playerCoinIcon:removeSelf( )
+			self.playerCoinIcon = nil
+		end
+		if self.playerCoin then
+			self.playerCoin:removeSelf( )
+			self.playerCoin = nil
+		end
+
+		if getting_promos then
+			network.cancel( getting_promos )
+		end
+
+	elseif phase == "did" then
+		-- Called when the scene is now off screen
+
+		
+
 	end
 end
 
@@ -103,10 +123,17 @@ function scene:destroy( event )
 	-- 
 	-- INSERT code here to cleanup the scene
 	-- e.g. remove display objects, remove touch listeners, save state, etc.
+	if self.playerCoinIcon then
+		self.playerCoinIcon:removeSelf( )
+		self.playerCoinIcon = nil
+	end
+	if self.playerCoin then
+		self.playerCoin:removeSelf( )
+		self.playerCoin = nil
+	end
 end
 
 local function marketPromoData(event)
-	print("VIRTUAL: " .. json.encode(event.response))
 	if ( event.isError ) then
         print( "Network error!" )
     else
@@ -118,7 +145,6 @@ end
 -- CALL TO API SERVICE
 function getMarketPromos (parameters)
 	local url, headers = vlp.async("marketpromos")
-	print(json.encode(headers))
 	getting_promos = network.request( url, "GET", marketPromoData, {headers=headers} )
 end
 
@@ -135,22 +161,23 @@ function scene:createTable(response)
 	if engine.player_id then
 		local gameStatus = engine.call("players/game_data", "POST", {id=engine.player_id, levels="true", currencies="true"})
 	
-	gold = gameStatus['currencies']['oro']['quantity']
-	lvls_achieved = table.getn(gameStatus['levels_completed'])
-	level = gameStatus['levels']['xp']
+		gold = gameStatus['currencies']['oro']['quantity']
+		lvls_achieved = table.getn(gameStatus['levels_completed'])
+		level = gameStatus['levels']['xp']
 	end
 	
 	local baseHeight = 173
 
 	--Player coins
-	local playerCoinIcon = display.newImageRect( sceneGroup, "coins_white.png", 15, 18 )
-	playerCoinIcon.anchorX = 1
-	playerCoinIcon.x = 310
-	playerCoinIcon.y = 90
+	print("CREATING PLAYERCOINS")
+	self.playerCoinIcon = display.newImageRect( sceneGroup, "images/greyCoins.png", 17, 14 )
+	self.playerCoinIcon.anchorX = 1
+	self.playerCoinIcon.x = 310
+	self.playerCoinIcon.y = 88
 
-	local playerCoin = display.newText( sceneGroup, gold, playerCoinIcon.x - 25, 90, "Roboto", 15 )
-	playerCoin:setFillColor( 0.30 )
-	playerCoin.anchorX = 1
+	self.playerCoin = display.newText( sceneGroup, gold, self.playerCoinIcon.x - 25, 85, "Roboto", 15 )
+	self.playerCoin:setFillColor( 0.30 )
+	self.playerCoin.anchorX = 1
 
 
 	mpspinner:removeSelf()
@@ -199,7 +226,6 @@ function scene:createTable(response)
 					
 					--Check if there is file
 					local path = system.pathForFile( thisPromo.id.."_marketpromo.png", system.TemporaryDirectory )
-					print(path)
 					local f=io.open(path,"r")
    					if f~=nil then 
    						io.close(f) 
@@ -214,9 +240,13 @@ function scene:createTable(response)
    					end
 				end
 				if params['remaining'] then
-					local remainingT = "Quedan " .. params['remaining'] .. " promo(s)"
-					local remaining = display.newText( row, remainingT, 160, row.height * 0.5, "Roboto", 14 )
-					remaining:setFillColor( 0 )
+					local remGroup = display.newGroup( )
+					row:insert(remGroup)
+					local remainingCircle = display.newImageRect( remGroup, "images/v_circulo_disponible.png", 66, 66 )
+					remainingCircle.x, remainingCircle.y = display.contentCenterX - 80, row.y + 25
+					local disponibles = display.newText( remGroup, "Quedan", remainingCircle.x, remainingCircle.y-10, "Roboto", 12 )
+					local disponiblesLabel = display.newText( remGroup, params['remaining'], remainingCircle.x, remainingCircle.y+5, "Roboto", 18 )
+
 				end
 				if params['short'] then
 					local shortT = params['short']
@@ -356,7 +386,7 @@ function scene:createTable(response)
 				local start = event.xStart
 			
 				local function backToPromos(event)
-					virtualMarket:remove(promosDetail)
+					
 				end
 
 				if event.phase == "ended" then
@@ -379,30 +409,30 @@ function scene:createTable(response)
     			listener = tableListener,
     			noLines = true
 			}
-			local promosDetail = widget.newTableView( optionsTable )
-			virtualMarket:insert(promosDetail)
+			self.promosDetail = widget.newTableView( optionsTable )
+			virtualMarket:insert(self.promosDetail)
 
 			-- insert into ROWS
 			--insert Rows
-			promosDetail:insertRow({rowHeight=133, params={isBox=true}})
-			promosDetail:insertRow({rowHeight=23, params={remaining=thisPromo.promo_qty}})
+			self.promosDetail:insertRow({rowHeight=133, params={isBox=true}})
+			self.promosDetail:insertRow({rowHeight=23, params={remaining=thisPromo.promo_qty}})
 		
-			promosDetail:insertRow({rowHeight=checkRowHeight(thisPromo.short_description, "Gotham Light", 12, 300), params={short=thisPromo.short_description}})
+			self.promosDetail:insertRow({rowHeight=checkRowHeight(thisPromo.title, "Gotham Light", 12, 300), params={short=thisPromo.title}})
 			--social
-			promosDetail:insertRow( {rowHeight=50, params={payment=price, id=thisPromo.id}} )
+			self.promosDetail:insertRow( {rowHeight=50, params={payment=price, id=thisPromo.id}} )
 			--description
-			promosDetail:insertRow( {rowHeight=35, params={title="DESCRIPCIÓN:"}} )
-			promosDetail:insertRow({rowHeight=checkRowHeight(thisPromo.long_description, "Gotham Light", 12, 300)+3, params={block=thisPromo.long_description}})
+			self.promosDetail:insertRow( {rowHeight=35, params={title="DESCRIPCIÓN:"}} )
+			self.promosDetail:insertRow({rowHeight=checkRowHeight(thisPromo.long_description, "Gotham Light", 12, 300)+3, params={block=thisPromo.long_description}})
 			--conditions
-			promosDetail:insertRow( {rowHeight=30, params={title="CONDICIONES:"}} )
-			promosDetail:insertRow({rowHeight=checkRowHeight(thisPromo.conditions, "Gotham Light", 12, 300), params={block=thisPromo.conditions}})
+			self.promosDetail:insertRow( {rowHeight=30, params={title="CONDICIONES:"}} )
+			self.promosDetail:insertRow({rowHeight=checkRowHeight(thisPromo.conditions, "Gotham Light", 12, 300), params={block=thisPromo.conditions}})
 			--Associate
-			promosDetail:insertRow( {rowHeight=30, params={title="NUESTRO ASOCIADO:"}} )
+			self.promosDetail:insertRow( {rowHeight=30, params={title="NUESTRO ASOCIADO:"}} )
 			local associate = thisPromo['associate']
-			promosDetail:insertRow( {rowHeight=25, params={column="", cell=associate['name']}} )
-			promosDetail:insertRow( {rowHeight=20, params={column="Tel: ", cell=associate['phone'], listen=associate['phone']}} )
-			promosDetail:insertRow( {rowHeight=20, params={column="", cell=associate['address']}} )
-			promosDetail:insertRow( {rowHeight=20, params={column="", cell=associate['website'], listen=associate['website']}} )
+			self.promosDetail:insertRow( {rowHeight=25, params={column="", cell=associate['name']}} )
+			self.promosDetail:insertRow( {rowHeight=20, params={column="Tel: ", cell=associate['phone'], listen=associate['phone']}} )
+			self.promosDetail:insertRow( {rowHeight=20, params={column="", cell=associate['address']}} )
+			self.promosDetail:insertRow( {rowHeight=20, params={column="", cell=associate['website'], listen=associate['website']}} )
 
 			transition.to(virtualMarket, {time=300, x = virtualMarket.x - 320})
 		end
@@ -434,23 +464,29 @@ function scene:createTable(response)
 		backBox.x = 5
 		backBox.y = 0
 
+		local remGroup = display.newGroup( )
+		row:insert(remGroup)
+		--local remainingCircle = display.newImageRect( remGroup, "images/v_circulo_disponible.png", 66, 66 )
+		--remainingCircle.x, remainingCircle.y = display.contentCenterX - 80, backBox.y + backBox.height
+		--local disponibles = display.newText( remGroup, "Quedan", remainingCircle.x, remainingCircle.y-10, "Roboto", 12 )
+		--local disponiblesLabel = display.newText( remGroup, promo.promo_qty, remainingCircle.x, remainingCircle.y+5, "Roboto", 18 )
+
+
 		--code for IMAGES here
-		print(promo.mobile_photo)
 		if promo.mobile_photo ~= nil and promo.mobile_photo ~= "/images/original/missing.png" then
 							
 			local function displayImg(event)
 				if event.phase == "ended" then
-					print("DOWNLOADED")
 					local image = display.newImage( row, event.response.filename, event.response.baseDirectory, 160, 1)
 					image.anchorY = 0
 					image.width = 320
 					image.height = 133
+					remGroup:toFront( )
 				end
 			end
 
 			local imgFilename = promo.id.."_marketpromo.png"
 			local path = system.pathForFile( imgFilename, system.TemporaryDirectory )
-			print(path)
 			local f=io.open(path,"r")
    			if f~=nil then 
    				io.close(f)
@@ -458,6 +494,7 @@ function scene:createTable(response)
    				detailImage.anchorY = 0
    				detailImage.width = 320
    				detailImage.height = 133
+   				remGroup:toFront( )
    			else 
    				self.images[promo.id] = network.download( promo.mobile_photo, "GET", displayImg, imgFilename, system.TemporaryDirectory )
 			end 
@@ -476,26 +513,21 @@ function scene:createTable(response)
 				align = "left"
 			}
 
-		local short = display.newText( row, promo.short_description, 15, backBox.height + 10, 285, 0, "Gotham Light", 11 )
+		local short = display.newText( row, promo.title, 15, backBox.height + 36, 285, 0, "Gotham Light", 11 )
 		short:setFillColor( 0 )
 		short.anchorX = 0
 		short.anchorY = 0
 
-		local priceText = display.newText( row, "Precio: "..price, 15, row.height - 20, "Roboto", 14 )
-		priceText.anchorX = 0
+		local priceText = display.newText( row, "Precio: "..price, backBox.width - 35, backBox.height + 23, "Roboto", 14 )
+		priceText.anchorX = 1
 		priceText.anchorY = 1
 		priceText:setFillColor( 0 )
 
-		local coinIcon = display.newImageRect( row, "coins.png", 18, 16 )
+		local coinIcon = display.newImageRect( row, "images/greyCoins.png", 18, 16 )
 		coinIcon.anchorY=1
 		coinIcon.anchorX=0
-		coinIcon.x = priceText.width + 20
+		coinIcon.x = priceText.x + 5
 		coinIcon.y = priceText.y
-
-		local qty = display.newText( row, "Quedan: ".. promo.promo_qty, row.width - 20, row.height - 20, "Roboto", 14 )
-		qty:setFillColor( 0.4 )
-		qty.anchorX = 1
-		qty.anchorY = 1
 
 
 	end
@@ -518,7 +550,7 @@ function scene:createTable(response)
 
 	-- Insert Rows
 	for index, promo in pairs(response) do
-		marketPromos:insertRow({rowHeight=checkRowHeight(promo.short_description .. "...", "Gotham Light", 11, 280) + baseHeight, params={promo=promo, gold=gold, level=level, lvls_achieved=lvls_achieved}})
+		marketPromos:insertRow({rowHeight=checkRowHeight(promo.title .. "...", "Gotham Light", 11, 280) + baseHeight, params={promo=promo, gold=gold, level=level, lvls_achieved=lvls_achieved}})
 	end
 end
 

@@ -4,6 +4,14 @@
 --
 -----------------------------------------------------------------------------------------
 local engine = require("engine")
+local ga = require("GoogleAnalytics.ga")
+
+ga.init({
+    isLive = false, 
+    testTrackingID = "UA-32094152-2",  -- Replace with your tracking code. If code is wrong it fails silently.
+    productionTrackingID = "UA-32094152-2",
+    debug = false,
+})
 -- show default status bar (iOS)
 display.setStatusBar( display.DefaultStatusBar )
 
@@ -12,7 +20,6 @@ local widget = require "widget"
 local composer = require "composer"
 G_baseUrl = "http://vivelapromo.herokuapp.com/api/"
 
-
 function checkRowHeight(text, font, fontSize, width)
 	local tempText = display.newText( text, 0, 0, width, 0, font, fontSize )
 	local rowHeight = tempText.height + 20
@@ -20,6 +27,7 @@ function checkRowHeight(text, font, fontSize, width)
 	tempText = nil
 	return rowHeight
 end
+
 
 function comma_value(amount)
   	local formatted = amount
@@ -38,7 +46,7 @@ local function promosView( event )
 end
 
 local function virtualView( event )
-	composer.gotoScene( "virtual" )
+	composer.gotoScene( "virtual")
 end
 
 local function missionsView( event )

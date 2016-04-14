@@ -10,6 +10,7 @@ local engine = require("engine")
 local json = require("json")
 local widget = require("widget")
 local vlp = require("vlp")
+local ga = require("GoogleAnalytics.ga")
 
 local fields = {}
 local data = {}
@@ -31,16 +32,19 @@ function scene:create( event )
 	local bg = display.newRect( 0, 0, display.contentWidth, display.contentHeight )
 	bg.anchorX = 0
 	bg.anchorY = 0
-	bg:setFillColor( 1 )	-- white
+	bg:setFillColor( 0.94  )	-- white
+    sceneGroup:insert( bg )
+    --local topBar = display.newRect( 160, 30, display.contentWidth, 65 )
+    --topBar:setFillColor( 0.27, 0.65, 0.61 )
 
-    local topBar = display.newRect( 160, 30, display.contentWidth, 65 )
-    topBar:setFillColor( 0.27, 0.65, 0.61 )
+    local bottomWhite = display.newRect( sceneGroup, display.contentCenterX, display.contentHeight, display.contentWidth, 45 )
+    bottomWhite.anchorY = 1
 
 
 
 	-- all objects must be added to group (e.g. self.view)
-	sceneGroup:insert( bg )
-    sceneGroup:insert(topBar)
+	
+    --sceneGroup:insert(topBar)
 
 end
 
@@ -50,6 +54,7 @@ function scene:show( event )
 
 	if phase == "will" then
 		-- Called when the scene is still off screen and is about to move on screen
+        ga.enterScene("Register")
 	elseif phase == "did" then
 		-- Called when the scene is now on screen
 		--
@@ -79,7 +84,7 @@ function scene:show( event )
             scrollHeight = 340,
             listener = scrollListener,
             horizontalScrollDisabled = true,
-            backgroundColor = { 0.94 }
+            hideBackground = true
         }
 
         local scrollView = widget.newScrollView(scrollOptions)

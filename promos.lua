@@ -10,10 +10,23 @@ local widget = require("widget")
 local json = require("json")
 local engine = require("engine")
 local vlp = require("vlp")
+local ga = require("GoogleAnalytics.ga")
+local utils = require("utils")
 
 local promo_id
 local showingDetails
+local latitude
+local longitude
+local gpsError = false
+local mapView
 
+
+
+--[[
+local gpsText = display.newText( "", display.contentCenterX, 100 , 200,0,"Arial", 20 )
+gpsText:setFillColor( 0 )
+local gpsText1 = display.newText( "", display.contentCenterX, 130 , "Arial", 20 )
+gpsText1:setFillColor( 0 )]]
 scene.categories = {}
 
 local function openURL( event )
@@ -38,26 +51,25 @@ end
 
 function scene:create( event )
 	local sceneGroup = self.view
-
 	-- Called when the scene's view does not exist.
 	--
 	-- INSERT code here to initialize the scene
 	-- e.g. add display objects to 'sceneGroup', add touch listeners, etc.
 
 	-- create a white background to fill screen
+
 	local bg = display.newRect( 0, 0, display.contentWidth, display.contentHeight )
 	bg.anchorX = 0
 	bg.anchorY = 0
 	bg:setFillColor( 1 )
 	sceneGroup:insert(bg)
 
+	local text = display.newText( sceneGroup, "JORGE", 200, 200, "Arial" )
 	local topBar = display.newRect( 160, 90, display.contentWidth, 40 )
 	topBar:setFillColor( 0.94, 0.94, 0.94 )
-	selected = display.newRect( 160, 90, 160, 40 )
-	selected:setFillColor( 0.79, 0.79, 0.79 )
+	
 	-- all objects must be added to group (e.g. self.view)
 	sceneGroup:insert(topBar)
-	sceneGroup:insert(selected)
 end
 
 function scene:show( event )
@@ -66,12 +78,67 @@ function scene:show( event )
 
 	if phase == "will" then
 		-- Called when the scene is still off screen and is about to move on screen
+		ga.enterScene("Promos")
+		--gpsText.text = "Voy a cargar runtime"
+		--
 	elseif phase == "did" then
+
+		local function locationHandler(e)
+			utils.print_r(e)
+			if ( event.errorCode ) then
+				gpsError = true
+        		native.showAlert( "Error activando el GPS", "No se puede sincronizar con el GPS", {"OK"} )
+        		print( "Location error: " .. tostring( event.errorMessage ) )
+    		else
+        		longitude = e.longitude
+        		latitude =  e.latitude
+        	end
+		end
+
+		if(system.getInfo("platformName") == "iPhone OS" or system.getInfo("platformName") == "Mac OS X") then
+			print("CREATING RUNTIME!!!!")
+			Runtime:addEventListener( "location", locationHandler )
+		else
+			mapView = native.newMapView( display.contentCenterX * 4 , display.contentCenterY, 200, 200)
+		end
+
+		local attempts = 0
+		local function mapLocationHandler( event )
+			if mapView then
+    			local currentLocation = mapView:getUserLocation()
+    			if ( currentLocation.errorCode or ( currentLocation.latitude == 0 and currentLocation.longitude == 0 ) ) then
+                	--gpsText.text = currentLocation.errorMessage .. " " .. attempts
+
+        			attempts = attempts + 1
+     				print("Attempts: ".. attempts)
+
+        			if ( attempts > 50 ) then
+        	   			gpsError = true
+        	   			native.showAlert( "No hay señal de GPS", "No se puede sincronizar con el GPS.", { "Okay" } )
+        			else
+            	 		timer.performWithDelay( 1000, mapLocationHandler )
+        			end
+    			else
+    				latitude = currentLocation.latitude
+    				longitude = currentLocation.longitude
+    				
+    				mapView:setCenter( currentLocation.latitude, currentLocation.longitude )
+        			mapView:removeAllMarkers( )
+        			mapView:addMarker( currentLocation.latitude, currentLocation.longitude )
+    			end
+			end
+		end
+
+		mapLocationHandler()
 		-- Called when the scene is now on screen
 		--
 		-- INSERT code here to make the scene come alive
 		-- e.g. start timers, begin animation, play audio, etc.
 		--self.getPromos()
+		selected = display.newRect( 160, 90, 160, 40 )
+		selected:setFillColor( 0.79, 0.79, 0.79 )
+		sceneGroup:insert(selected)
+		
 		local showingDetails = false
 		local scrolling = false
 		local params = {}
@@ -98,14 +165,23 @@ function scene:show( event )
 
 		local function showDetails(event)
 			local promo = event.target.promo
+			ga.event("Views", "Details", promo.title)
 
 			-- SOCIAL PAYMENT
 			local function socialActivate(event)
 				local promoToSend = event.target.promo_id
+				local social = event.target.social
+
 
 				local function socialPayment(event)
-					print("socialPayment Function")
-					print(event.action)
+
+					if social == "twitter" then
+						ga.social("Twitter", promo.title, "Share")
+					end
+
+					if social == "facebook" then
+						ga.social("Facebook", promo.title, "Share")
+					end
 
 					if event.action == "sent" or event.action == "cancelled" then
 
@@ -167,7 +243,7 @@ function scene:show( event )
 
 							engine.send_accomplishment({player_id = engine.player_id, tag = "promo_"}, true)
 							engine.send_accomplishment({player_id = engine.player_id, tag = category}, true)
-							engine.send_accomplishment({player_id = engine.player_id, tag = associate.name}, true)
+							engine.send_accomplishment({player_id = engine.player_id, tag = promo.associate.name}, true)
 
 						end
 
@@ -182,10 +258,11 @@ function scene:show( event )
 
 				-- SOCIAL POPUP
 				if string.sub(system.getInfo( "model" ), 1, 2) == "iP" then
-					print("The model is Apple: use individual service")
+
+					--print(promo.associate.name)
+					--engine.send_accomplishment({player_id = engine.player_id, tag = promo.associate.name}, true)
 
 					if native.canShowPopup( "social", event.target.social ) then
-						print("NATIVE CAN SHOW POPUP")
 
 						local options = {
 							service = event.target.social,
@@ -205,7 +282,6 @@ function scene:show( event )
 					end
 
 				else
-					print("model should be android")
 					local serviceName = event.target
 					local options = {
 						service = "share",
@@ -255,14 +331,15 @@ function scene:show( event )
 					end
 
 					if params.remaining then
-						if promo.remainingPromos then
-							self.quedanDetail[promo.id] = display.newText( row, "Quedan: "..promo.remainingPromos.." promo(s)", 160, h, "Roboto", 14 )
-							--self.quedanDetail[promo.id].qty = promo.remainingPromos
-							self.quedanDetail[promo.id]:setFillColor( 0.4 )
-						else
-							local remaining = display.newText( row, "Promo ilimitada", 160, h, "Roboto", 14 )
-							remaining:setFillColor( 0.4 )
-						end
+						
+						--TODO QUEDAN
+						local remGroup = display.newGroup( )
+						row:insert(remGroup)
+						local remainingCircle = display.newImageRect( remGroup, "images/v_circulo_disponible.png", 66, 66 )
+						remainingCircle.x, remainingCircle.y = display.contentCenterX - 80, row.y + 30
+						local disponibles = display.newText( remGroup, "Quedan", remainingCircle.x, remainingCircle.y-10, "Roboto", 12 )
+						local disponiblesLabel = display.newText( remGroup, promo.remainingPromos, remainingCircle.x, remainingCircle.y+5, "Roboto", 18 )
+
 					end
 
 					if params.block then
@@ -365,7 +442,7 @@ function scene:show( event )
 
 				self.detailTable:insertRow( {rowHeight=133, params={image = true}} )
 				self.detailTable:insertRow( {rowHeight=30, params={remaining = true}} )
-				self.detailTable:insertRow( {rowHeight=checkRowHeight(promo.short_description, "Gotham Light", 12, 285), params={block = promo.short_description}} )
+				self.detailTable:insertRow( {rowHeight=checkRowHeight(promo.title, "Gotham Light", 12, 285), params={block = promo.title}} )
 				self.detailTable:insertRow( {rowHeight=50, params={social = true}} )
 				self.detailTable:insertRow( {rowHeight=25, params={title="DESCRIPCIÓN"}} )
 				self.detailTable:insertRow( {rowHeight=checkRowHeight(promo.long_description, "Gotham Light", 12, 285), params={block = promo.long_description}} )
@@ -412,6 +489,7 @@ function scene:show( event )
 					menuItem:setFillColor( 0.30 )
 					x = x + 160
 
+					-- RENDERS EACH PROMO
 					local function rowRender(event)
 						local row = event.row
 						local promo = row.params.promo
@@ -427,6 +505,15 @@ function scene:show( event )
 						imgBg.anchorY = 0
 						imgBg:setFillColor( 0.9 )
 
+						local remGroup = display.newGroup( )
+
+						row:insert(remGroup)
+						--print(json.encode(promo))
+						--local remainingCircle = display.newImageRect( remGroup, "images/v_circulo_disponible.png", 66, 66 )
+						--remainingCircle.x, remainingCircle.y = display.contentCenterX - 80, imgBg.y + imgBg.height
+						--local disponibles = display.newText( remGroup, "Quedan", remainingCircle.x, remainingCircle.y-10, "Roboto", 12 )
+						--local disponiblesLabel = display.newText( remGroup, promo.remainingPromos, remainingCircle.x, remainingCircle.y+5, "Roboto", 18 )
+
 						local categoryName = display.newText( row, promo.category, 160, imgBg.height / 2, "Roboto", 14 )
 						categoryName:setFillColor( 0.30, 0.30, 0.30 )
 
@@ -438,6 +525,7 @@ function scene:show( event )
 									image.anchorY = 0
 									image.width = 320
 									image.height = 133
+									remGroup:toFront()
 								end
 							end
 
@@ -450,6 +538,7 @@ function scene:show( event )
    								detailImage.anchorY = 0
    								detailImage.width = 320
    								detailImage.height = 133
+								remGroup:toFront()
    							else
    								self.images[promo.id] = network.download( promo.mobile_photo, "GET", displayImg, imgFilename, system.TemporaryDirectory )
 
@@ -457,29 +546,10 @@ function scene:show( event )
 						end
 
 						local printStringTitle = (string.len(promo.title) < 90) and promo.title or string.sub(promo.title, 0, 86)
-						local short = display.newText( row, printStringTitle, 15, imgBg.height + 10, 285, 0, "Gotham Light", 11 )
+						local short = display.newText( row, printStringTitle, 15, 150, 285, 0, "Gotham Light", 11 )
 						short:setFillColor( 0 )
 						short.anchorY = 0
 						short.anchorX = 0
-
-						if promo.remainingPromos then
-							self.quedan[promo.id] = display.newText( row, "Quedan: " .. promo.remainingPromos, 15, bgBox.height - 10, "Roboto", 14 )
-							self.quedan[promo.id].anchorX = 0
-							self.quedan[promo.id].anchorY = 1
-							self.quedan[promo.id]:setFillColor( 0.3 )
-							--self.quedan[promo.id].qty = promo.remainingPromos
-						end
-
-						local function getPriceTitle(id, price)
-							if id == 1 then return "Por solo: $" .. comma_value(price) end
-							if id == 2 then return "Desde: $" .. comma_value(price) end
-							if id == 3 then return "GRATIS" end
-						end
-
-						local priceText = display.newText( row, getPriceTitle(promo.price_title_id, promo.price), 305, bgBox.height - 10, "Roboto", 16 )
-        				priceText:setFillColor( 0.27, 0.65, 0.61 )
-        				priceText.anchorX = 1
-        				priceText.anchorY = 1
 
 					end
 
@@ -560,6 +630,10 @@ function scene:show( event )
 					local function getPromos(event)
 						if not event.isError then
 							local promos = json.decode(event.response)
+							--if promos[1] and promos[1].category == "Banner" then
+								--print("CATEGORY IS BANNER")
+								--utils.print_r(promos)
+							--end
 							local baseHeight = 173
 							spinner:removeSelf( )
 							spinner = nil
@@ -574,20 +648,74 @@ function scene:show( event )
 								local h = checkRowHeight(promo.title, "Gotham Light", 11, 285) + baseHeight
 								promosTable:insertRow({rowHeight=checkRowHeight(promo.title .. "...", "Gotham Light", 11, 280) + baseHeight, params={promo=promo, h=h}})
 							end
+						else
+							print("ERROR GETTING PROMOS OF A CATEGORY")
 						end
 					end
 
 
 					-- CALL PROMOS FOR THIS CATEOGRY
-					local url = vlp.async("promos", {category = category})
+					print(category)
+					local parameters = {category = category}
+					if latitude then parameters.latitude = latitude end
+					if longitude then parameters.longitude = longitude end
+					local url = vlp.async("promos", parameters)
 					self.requests[index] = network.request( url, "GET", getPromos, params )
-
+					
 				end
 			end
 		end
 
-		local get_url = vlp.async("promos")
-		self.getting_promos = network.request( get_url, "GET", getCategories, params )
+		local retries = 0
+		local function callForCategories(e)
+			local function stopGPS()
+				if(system.getInfo("platformName") == "iPhone OS" or system.getInfo("platformName") == "Mac OS X") then
+					Runtime:removeEventListener( "location", locationHandler )
+				else
+					if mapView then
+						mapView:removeSelf( )
+						mapView = nil
+					end
+				end
+			end
+
+			local parameters = {}
+			if latitude then parameters.latitude = latitude end
+			if longitude then parameters.longitude = longitude end
+			if latitude and longitude then
+				print("Latitude = " .. latitude)
+				print("Longitude = " .. longitude)
+				stopGPS()
+			end
+			if gpsError then
+				stopGPS()
+			end
+			if latitude or retries >= 30 or gpsError then 
+				local get_url = vlp.async("promos", parameters)
+				print(get_url)
+				self.getting_promos = network.request( get_url, "GET", getCategories, params )
+			else
+				retries = retries + 1
+				timer.performWithDelay( 1000, callForCategories, 1 )
+			end
+		end
+		timer.performWithDelay( 500, callForCategories, 1 )
+
+		-- TUTORIAL
+		local showTutorial = engine.getPlayerId()
+
+		if not showTutorial then
+			local options = {
+    				isModal = true,
+    				effect = "fade",
+    				time = 400,
+    				params = {
+        				images = {"images/tutorial1.png", "images/tutorial2.png", "images/tutorial3.png", 
+        				"images/tutorial4.png","images/tutorial5.png"}
+   					}
+				}
+			composer.showOverlay( "tutorial", options )
+		end
 	end
 end
 
@@ -600,8 +728,13 @@ function scene:hide( event )
 		--
 		-- INSERT code here to pause the scene
 		-- e.g. stop timers, stop animation, unload sounds, etc.)
-	elseif phase == "did" then
-		-- Called when the scene is now off screen
+		selected:removeSelf( )
+		selected = nil 
+
+		if mapView then
+			mapView:removeSelf( )
+			mapView = nil
+		end
 
 		if self.getting_promos then
 			network.cancel(self.getting_promos)
@@ -616,22 +749,29 @@ function scene:hide( event )
 				network.cancel( image )
 			end
 		end
-
 		if self.categoryMenu then
 			self.categoryMenu:removeSelf( )
 			self.categoryMenu = nil
+		end
+
+		if self.categoryTables then
+			self.categoryTables:removeSelf( )
+			self.categoryTables = nil
 		end
 
 		if self.detailTable then
 			self.detailTable:removeSelf( )
 			self.detailTable = nil
 		end
+	elseif phase == "did" then
+		-- Called when the scene is now off screen
+
+		
 	end
 end
 
 function scene:destroy( event )
 	local sceneGroup = self.view
-
 	-- Called prior to the removal of scene's "view" (sceneGroup)
 	--
 	-- INSERT code here to cleanup the scene

@@ -10,6 +10,7 @@ local engine = require("engine")
 local json = require("json")
 local widget = require("widget")
 local vlp = require("vlp")
+local ga = require("GoogleAnalytics.ga")
 
 local timer_surprise
 local timer_1
@@ -46,6 +47,7 @@ function scene:show( event )
 
 	if phase == "will" then
 		-- Called when the scene is still off screen and is about to move on screen
+        ga.enterScene("Missions")
 	elseif phase == "did" then
 		-- Called when the scene is now on screen
 		--
@@ -79,14 +81,14 @@ function scene:show( event )
     			local gold = response['currencies']['oro']['quantity']
 
     			--Player coins
-				local playerCoinIcon = display.newImageRect( sceneGroup, "coins_white.png", 15, 18 )
-				playerCoinIcon.anchorX = 1
-				playerCoinIcon.x = 310
-				playerCoinIcon.y = 90
+				self.playerCoinIcon = display.newImageRect( sceneGroup, "images/greyCoins.png", 17, 14 )
+				self.playerCoinIcon.anchorX = 1
+				self.playerCoinIcon.x = 310
+				self.playerCoinIcon.y = 90
 
-				local playerCoin = display.newText( sceneGroup, gold, playerCoinIcon.x - 25, 88, "Roboto", 15 )
-				playerCoin:setFillColor( 0.30 )
-				playerCoin.anchorX = 1
+				self.playerCoin = display.newText( sceneGroup, gold, self.playerCoinIcon.x - 25, 88, "Roboto", 15 )
+				self.playerCoin:setFillColor( 0.30 )
+				self.playerCoin.anchorX = 1
 
 
     			local function missionRowRender(event)
@@ -313,10 +315,7 @@ function scene:show( event )
     		end
 		end
 
-
-
 		local url, headers = engine.async("players/game_data", {id=engine.player_id, missions="true", currencies="true"})
-		print(url)
 		getting_missions = network.request(url, "POST", missionsResponse, {headers=headers})
 
         end --END IF NO G_PLAYER
@@ -332,29 +331,44 @@ function scene:hide( event )
 		--
 		-- INSERT code here to pause the scene
 		-- e.g. stop timers, stop animation, unload sounds, etc.)
-	elseif phase == "did" then
-		-- Called when the scene is now off screen
-
-		if timer_surprise then
-			timer.cancel(timer_surprise)
-		end
-		if timer_1 then
-			timer.cancel(timer_1)
-		end
-		if timer_2 then
-			timer.cancel(timer_2)
-		end
-		if timer_3 then
-			timer.cancel(timer_3)
-		end
-		if timer_4 then
-			timer.cancel(timer_4)
-		end
+        if timer_surprise then
+            timer.cancel(timer_surprise)
+        end
+        if timer_1 then
+            timer.cancel(timer_1)
+        end
+        if timer_2 then
+            timer.cancel(timer_2)
+        end
+        if timer_3 then
+            timer.cancel(timer_3)
+        end
+        if timer_4 then
+            timer.cancel(timer_4)
+        end
 
         if self.missionTable then
             self.missionTable:removeSelf( )
             self.missionTable = nil
         end
+
+        if getting_missions then
+            network.cancel( getting_missions )
+        end
+
+        if self.playerCoinIcon then
+            self.playerCoinIcon:removeSelf( )
+            self.playerCoinIcon = nil
+        end
+        if self.playerCoin then
+            self.playerCoin:removeSelf( )
+            self.playerCoin = nil
+        end
+
+	elseif phase == "did" then
+		-- Called when the scene is now off screen
+
+		
 	end
 end
 
@@ -368,6 +382,17 @@ function scene:destroy( event )
     if self.missionTable then
         self.missionTable:removeSelf( )
         self.missionTable = nil
+    end
+    if getting_missions then
+        network.cancel( getting_missions )
+    end
+    if self.playerCoinIcon then
+        self.playerCoinIcon:removeSelf( )
+        self.playerCoinIcon = nil
+    end
+    if self.playerCoin then
+        self.playerCoin:removeSelf( )
+        self.playerCoin = nil
     end
 end
 

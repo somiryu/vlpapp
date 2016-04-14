@@ -3,6 +3,8 @@ local mime = require("mime")
 local json = require("json")
 local http = require("socket.http")
 local ltn12 = require( "ltn12" )
+local utils = require("utils")
+local multiform = require "libs.multiform"
 local engine = {}
 print("ENGINE module loaded")
 
@@ -17,11 +19,62 @@ local function buildUrl(service, parameters)
 			body = body .. key .. "=" .. require("socket.url").escape(value)
 		end
 	end
-	return "http://104.236.49.251/api/" .. service .. body
+	return "http://playngage.io/api/" .. service .. body
+end
+
+engine.upload = function(service, player_id, filename)
+	--local player_id = 1 -- FOR TEST
+	print("UPLOAD")
+	local boundary = "MPFD-"..crypto.digest( crypto.sha1, "MultipartFormData"..tostring(object)..tostring(os.time())..tostring(os.clock()), false )
+	--local url =  "http://localhost:4003/api/" .. service -- FOR TEST
+	local url =  "http://playngage.io/api/" .. service
+
+	local pre = "--"..boundary.."\r\n"
+	local pos = "--"..boundary.."--\r\n"
+
+	local file = io.open( system.pathForFile( filename, system.DocumentsDirectory ), "rb" )
+	local content = file:read("*all")
+	file:close()
+
+	local body = pre.."Content-Disposition: form-data; name=\"avatar\"; filename=\"".. filename..  "\"\r\n" ..
+		"Content-Transfer-Encoding: binary\r\n" ..
+		"Content-Type: image/png\r\n" ..
+		"\r\n" .. content ..
+		"\r\n"
+
+	body = body .. pre .. "Content-Disposition: form-data; name=\"player_id\"\r\n" ..
+		"\r\n" .. player_id ..
+		"\r\n" 
+
+	body = body .. pos
+
+	local response = {}
+	local a, b, c = http.request{
+		url = url,
+		method = "POST",
+		source = ltn12.source.string(body), 
+		headers = {
+			["Accept"] = "*/*",
+			["Authorization"] = "Token token=37b431bd6b9e9f5883b95e3d6d9e5cab", 
+			--["Authorization"] = "Token token=5b97ecdcccad92fac0f85383d3858d9b", -- FOR TEST
+			["Content-Type"] = "multipart/form-data; boundary="..boundary,
+			["content-length"] = string.len(body)},
+		sink = ltn12.sink.table(response)
+	}
+	print("RESPONSE IN LIB: ")
+	local joined = ""
+	if #response > 0 then
+		for i = 1, #response do
+			joined = joined .. response[i]
+		end
+	end
+	local data = json.decode(joined)
+	utils.print_r(data)
+	return data
 end
 
 engine.call = function(service, method, parameters)
-	
+	print("CALL")
 	local url = buildUrl(service, parameters)
 
 	local response = {}
@@ -35,10 +88,12 @@ engine.call = function(service, method, parameters)
 		sink = ltn12.sink.table(response)
 	}
 	response = json.decode(response[1])
+	print("RESPONSE CALL")
 	return response
 end
 
 engine.async = function(service, parameters)
+	print("ASYNC ".. service)
 	return buildUrl(service, parameters), {["Authorization"] = "Token token=37b431bd6b9e9f5883b95e3d6d9e5cab", ["Accept"] = "*/*", ["Content-type"] = "application/x-www-form-urlencoded"}
 end
 
@@ -46,7 +101,7 @@ local function async(service, parameters)
 	return buildUrl(service, parameters), {["Authorization"] = "Token token=37b431bd6b9e9f5883b95e3d6d9e5cab", ["Accept"] = "*/*", ["Content-type"] = "application/x-www-form-urlencoded"}
 end
 
-engine.send_accomplishtment = function(parameters, tag_type)
+engine.send_accomplishment = function(parameters, tag_type)
 	local service = "accomplishments" 
 	if tag_type then
 		sevice = service .. "/tag_type"
@@ -54,6 +109,7 @@ engine.send_accomplishtment = function(parameters, tag_type)
 	local url, headers = async(service, parameters)
 
 	local accomplishmentSent = function(e)
+		utils.print_r(e)
 		if not e.isError then
 			print("ACCOMPLISHMENT SENT")
 		end

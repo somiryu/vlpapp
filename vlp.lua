@@ -6,7 +6,7 @@ local ltn12 = require( "ltn12" )
 local vlp = {}
 
 vlp.baseUrl = "http://www.vivelapromo.com/api/"
---vlp.baseUrl = "http://localhost:3001/api/"
+--vlp.baseUrl = "http://localhost:3000/api/"
 
 local spinnerOptions = {
 	width = 30,
@@ -16,7 +16,7 @@ local spinnerOptions = {
     sheetContentHeight = 30
 }
 
-local spinnerSheet = graphics.newImageSheet( "spinner.png", spinnerOptions )
+local spinnerSheet = graphics.newImageSheet( "images/spinner.png", spinnerOptions )
 
 vlp.spinOpt = {
 	width=30, 

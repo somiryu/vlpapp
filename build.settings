@@ -29,6 +29,44 @@ settings =
 	{
 		plist =
 		{
+			NSAppTransportSecurity = 
+			{
+				NSExceptionDomains = 
+				{
+					["vivelapromo.com"] =			
+					{
+						NSIncludesSubdomains = true,
+						NSThirdPartyExceptionRequiresForwardSecrecy = false,
+						NSExceptionAllowsInsecureHTTPLoads = true,
+					},
+					["google-analytics.com"] = 
+					{
+						NSIncludesSubdomains = true,
+						NSThirdPartyExceptionRequiresForwardSecrecy = false,
+						NSExceptionAllowsInsecureHTTPLoads = true,
+					},
+					["amazonaws.com"] = 
+					{
+						NSIncludesSubdomains = true,
+						NSThirdPartyExceptionRequiresForwardSecrecy = false,
+						NSExceptionAllowsInsecureHTTPLoads = true,
+					},
+					["playngage.io"] = 
+					{
+						NSIncludesSubdomains = true,
+						NSThirdPartyExceptionRequiresForwardSecrecy = false,
+						NSExceptionAllowsInsecureHTTPLoads = true,
+					},
+					["104.236.49.251"] = 
+					{
+						NSIncludesSubdomains = true,
+						NSThirdPartyExceptionRequiresForwardSecrecy = false,
+						NSExceptionAllowsInsecureHTTPLoads = true,
+					},
+				}
+			},
+
+			NSLocationWhenInUseUsageDescription = "This app uses maps for getting promos near the user.",
 			UIStatusBarHidden = false,
 			UIPrerenderedIcon = true, -- set to false for "shine" overlay
 			--UIApplicationExitsOnSuspend = true, -- uncomment to quit app on suspend
@@ -117,7 +155,19 @@ settings =
 		{
 			"android.permission.INTERNET",
 			"android.permission.CALL_PHONE",
+            "android.permission.ACCESS_FINE_LOCATION",
+            "android.permission.ACCESS_COARSE_LOCATION",
 		},
+		usesFeatures =
+        {
+            -- If you set permissions "ACCESS_FINE_LOCATION" and "ACCESS_COARSE_LOCATION" above,
+            -- you may want to set up your app to not require location services as follows.
+            -- Otherwise, devices that do not have location sevices (such as a GPS) will be unable
+            -- to purchase this app in the app store.
+            { name = "android.hardware.location", required = false },
+            { name = "android.hardware.location.gps", required = false },
+            { name = "android.hardware.location.network", required = false }
+        },
 	},
 
 	plugins =
