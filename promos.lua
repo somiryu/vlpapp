@@ -67,7 +67,7 @@ function scene:create( event )
 	local text = display.newText( sceneGroup, "JORGE", 200, 200, "Arial" )
 	local topBar = display.newRect( 160, 90, display.contentWidth, 40 )
 	topBar:setFillColor( 0.94, 0.94, 0.94 )
-	
+
 	-- all objects must be added to group (e.g. self.view)
 	sceneGroup:insert(topBar)
 end
@@ -121,7 +121,7 @@ function scene:show( event )
     			else
     				latitude = currentLocation.latitude
     				longitude = currentLocation.longitude
-    				
+
     				mapView:setCenter( currentLocation.latitude, currentLocation.longitude )
         			mapView:removeAllMarkers( )
         			mapView:addMarker( currentLocation.latitude, currentLocation.longitude )
@@ -138,7 +138,7 @@ function scene:show( event )
 		selected = display.newRect( 160, 90, 160, 40 )
 		selected:setFillColor( 0.79, 0.79, 0.79 )
 		sceneGroup:insert(selected)
-		
+
 		local showingDetails = false
 		local scrolling = false
 		local params = {}
@@ -166,7 +166,13 @@ function scene:show( event )
 		local function showDetails(event)
 			local promo = event.target.promo
 			ga.event("Views", "Details", promo.title)
+			-- ACA TENGO QUE HACER LO MIO
+			local function detailListener(e)
+				utils.print_r(e.response)
+			end
 
+			local url, headers = vlp.async("promos/promo_detail", {promo_id = promo.id, id_in_engine = engine.player_id})
+			network.request( url, "POST", detailListener, {headers=headers} )
 			-- SOCIAL PAYMENT
 			local function socialActivate(event)
 				local promoToSend = event.target.promo_id
@@ -278,7 +284,7 @@ function scene:show( event )
 						end
 
 						native.showPopup( "social", options )
-						
+
 					end
 
 				else
@@ -331,7 +337,7 @@ function scene:show( event )
 					end
 
 					if params.remaining then
-						
+
 						--TODO QUEDAN
 						local remGroup = display.newGroup( )
 						row:insert(remGroup)
@@ -661,7 +667,7 @@ function scene:show( event )
 					if longitude then parameters.longitude = longitude end
 					local url = vlp.async("promos", parameters)
 					self.requests[index] = network.request( url, "GET", getPromos, params )
-					
+
 				end
 			end
 		end
@@ -690,7 +696,7 @@ function scene:show( event )
 			if gpsError then
 				stopGPS()
 			end
-			if latitude or retries >= 30 or gpsError then 
+			if latitude or retries >= 30 or gpsError then
 				local get_url = vlp.async("promos", parameters)
 				print(get_url)
 				self.getting_promos = network.request( get_url, "GET", getCategories, params )
@@ -710,7 +716,7 @@ function scene:show( event )
     				effect = "fade",
     				time = 400,
     				params = {
-        				images = {"images/tutorial1.png", "images/tutorial2.png", "images/tutorial3.png", 
+        				images = {"images/tutorial1.png", "images/tutorial2.png", "images/tutorial3.png",
         				"images/tutorial4.png","images/tutorial5.png"}
    					}
 				}
@@ -729,7 +735,7 @@ function scene:hide( event )
 		-- INSERT code here to pause the scene
 		-- e.g. stop timers, stop animation, unload sounds, etc.)
 		selected:removeSelf( )
-		selected = nil 
+		selected = nil
 
 		if mapView then
 			mapView:removeSelf( )
@@ -766,7 +772,7 @@ function scene:hide( event )
 	elseif phase == "did" then
 		-- Called when the scene is now off screen
 
-		
+
 	end
 end
 

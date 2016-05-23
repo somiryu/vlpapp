@@ -44,7 +44,7 @@ function scene:create( event )
 
 
 	-- all objects must be added to group (e.g. self.view)
-	
+
     --sceneGroup:insert(topBar)
 
 end
@@ -66,6 +66,7 @@ function scene:show( event )
         local validUser = false
         local validEmail = false
         local validPass = false
+				local validCity = false
         local registerBtn
 
         fields = {}
@@ -80,12 +81,10 @@ function scene:show( event )
             top = 0,
             left = 0,
             width = 320,
-            height = 480,
-            scrollWidth = 320,
-            scrollHeight = 340,
+            height = 420,
             listener = scrollListener,
             horizontalScrollDisabled = true,
-            hideBackground = true
+            hideBackground = false
         }
 
         local scrollView = widget.newScrollView(scrollOptions)
@@ -100,6 +99,11 @@ function scene:show( event )
         passErrorMsg.alpha = 0
         scrollView:insert(passErrorMsg)
 
+				local cityErrorMsg = display.newText("No a seleccionado una ciudad", 160, 290, "Gotham Light", 13)
+				cityErrorMsg:setFillColor( 1,0,0 )
+        cityErrorMsg.alpha = 0
+        scrollView:insert(cityErrorMsg)
+
         local mailErrorMsg = display.newText("Has ingresado un email inválido.", 160, 290, "Gotham Light", 13)
         mailErrorMsg:setFillColor( 1,0,0 )
         mailErrorMsg.alpha = 0
@@ -111,28 +115,28 @@ function scene:show( event )
         scrollView:insert(answerErrorMsg)
 
         local function textListener( event )
+					if event.target.type == "Ciudad" then
+
+						validCity = true
+						data["city_id"] = event.target.id
+					end
             if event.phase == "began" and event.target.isSecure == false then
                 if event.target.isPassword then
                     event.target.isSecure = true
                     native.setKeyboardFocus( event.target )
                 end
             elseif ( event.phase == "ended" or event.phase == "submitted" ) then
-            -- do something with defaultField text
-
                 answerErrorMsg.alpha = 0
+								local target = event.target
                 local text = event.target.text
                 local typeT = event.target.type
                 if typeT == "Usuario" then
-                    --native.setKeyboardFocus( fields[2] )
                 elseif typeT == "Email" then
-                    --native.setKeyboardFocus( fields[3] )
                 elseif typeT == "Contraseña"  then
                     typeT = "password"
-                    --native.setKeyboardFocus( fields[4] )
                 elseif typeT == "Confirma la contraseña" then
                     typeT = "confirm"
-                    --native.setKeyboardFocus( nil )
-                elseif typeT == "Código Promotor" then
+                elseif typeT == "Código Promocional (opcional)" then
                     typeT = "p_code"
                 end
 
@@ -151,7 +155,8 @@ function scene:show( event )
                         data[typeT] = text
                         validUser = true
                     end
-                else
+								elseif typeT == "Ciudad" then
+								else
                     data[typeT] = text
                 end
 
@@ -164,16 +169,25 @@ function scene:show( event )
                         passErrorMsg.alpha = 1
                     end
                 end
-
-                if validUser == true and validEmail == true and validPass == true then
+								if validUser then
+									print("User")
+								end
+								if validCity then
+									print("City")
+								end
+								if validPass then
+									print("Pass")
+								end
+								if validEmail then
+									print("Email")
+								end
+                if validUser == true and validEmail == true and validPass == true and validCity == true then
+									print("VALID SHIT")
+									utils.print_r(data)
                     registerBtn.alpha = 1
-
                     local submitRegister = function(e)
                         e.target.alpha = 0
-                        
                         local function go(e)
-                            utils.print_r(data)
-                            
                             answer = vlp.call("users", "POST", data)
                             if answer.status ~= "ok" then
                                 answerErrorMsg.alpha = 1
@@ -185,7 +199,6 @@ function scene:show( event )
                         end
                         timer.performWithDelay( 50, go, 1 )
                     end
-
                     registerBtn:addEventListener( "tap", submitRegister )
                 end
 
@@ -193,21 +206,77 @@ function scene:show( event )
             end
         end
 
-        local fieldToDraw = {"Usuario", "Email", "Contraseña", "Confirma la contraseña", "Código Promotor"}
+
+        local fieldToDraw = {"Usuario", "Email", "Contraseña", "Confirma la contraseña", "Código Promocional (opcional)", "Ciudad"}
         local y = 140
         for i, field in pairs(fieldToDraw) do
-            fields[i] = native.newTextField( 160, y, 250, 30 )
-            fields[i]:addEventListener( "userInput", textListener )
-            fields[i].type = field
-            fields[i].font = native.newFont("Gotham Light", 13)
-            fields[i].placeholder = field
+						if field ~= "Ciudad" then
+	            fields[i] = native.newTextField( 160, y, 250, 30 )
+	            fields[i]:addEventListener( "userInput", textListener )
+	            fields[i].type = field
+	            fields[i].font = native.newFont("Gotham Light", 13)
+	            fields[i].placeholder = field
+	            if field == "Contraseña" or field == "Confirma la contraseña" then
+	                fields[i].isPassword = true
+	            end
+							y = y + 40
+							scrollView:insert(fields[i])
+						else
+							local citiestoDraw = { "Bogotá D.C.",  "Eje Cafetero", "Medellín", "Cali", "Barranquilla"}
+							local cities = {}
+							for i, city in pairs( citiestoDraw ) do
+								cities[i] = {}
+								cities[i].name = city
+								if i == 1 then
+									cities[i].id = 1
+								elseif i == 2 then
+									cities[i].id = 2
+								elseif i == 3 then
+									cities[i].id = 4
+								elseif i == 4 then
+									cities[i].id = 5
+								elseif i == 5 then
+									cities[i].id = 6
+								end
+							end
 
-            if field == "Contraseña" or field == "Confirma la contraseña" then
-                fields[i].isPassword = true
-            end
+							local function cityListener(e)
+								for i = 1, #fields do
+									if fields[i].type == "Ciudad" then
+										for j = 1, #fields[i] do
+										fields[i][j].active = false
+										fields[i][j]:setFillColor(0.8)
+										end
+									end
+								end
+								local target = e.target
+								target.active = true
+								target:setFillColor(0.09, 0.4, 0.38)
+							end
 
-            y = y + 40
-            scrollView:insert(fields[i])
+							fields[i] = {}
+							fields[i].type = "Field Ciudad"
+							for j, c in pairs( cities ) do
+								print("logging")
+								utils.print_r(c)
+								print(c.name)
+								fields[i][j] = display.newText({text = c.name, font = native.newFont("Gotham Light", 20), x = display.contentCenterX , y = y })
+								fields[i][j].id = c.id
+								fields[i][j].active = false
+								fields[i][j].type = "Ciudad"
+								fields[i][j]:addEventListener("touch", cityListener)
+								fields[i][j]:addEventListener( "touch", textListener )
+								fields[i][j]:setFillColor(0.8)
+								y = y + 40
+								scrollView:insert(fields[i][j])
+							end
+							--fields[i] = native.newText( 160, y, 250, 30)
+							--fields[i].id = 2
+						 	--fields[i].active = false
+							--fields[i]:addEventListener("touch", cityListener)
+							--fields[i]:setFillColor(0.8)
+							--fields[i].type = "city"
+						end
         end
 
         y = y + 28
@@ -217,7 +286,7 @@ function scene:show( event )
         registerBtn.alpha = 0.5
         scrollView:insert(registerBtn)
         local regText = display.newText( "Regístrate", 160, y-3, "Roboto", 14 )
-		scrollView:insert(regText)
+				scrollView:insert(regText)
 
         y = y + 40
         local haveAccount = display.newRoundedRect( 160, y, 170, 35, 5 )
@@ -246,8 +315,10 @@ function scene:hide( event )
 		-- e.g. stop timers, stop animation, unload sounds, etc.)
         print(json.encode(fields))
         for i, obj in pairs(fields) do
-            obj:removeSelf()
-            obj = nil
+						if fields[i].type ~= "Field Ciudad" then
+							obj:removeSelf()
+						end
+						obj = nil
         end
         fields = nil
 
