@@ -84,7 +84,7 @@ function scene:show( event )
             height = 420,
             listener = scrollListener,
             horizontalScrollDisabled = true,
-            hideBackground = false
+            hideBackground = true
         }
 
         local scrollView = widget.newScrollView(scrollOptions)
@@ -242,7 +242,7 @@ function scene:show( event )
 
 							local function cityListener(e)
 								for i = 1, #fields do
-									if fields[i].type == "Ciudad" then
+									if fields[i].type == "Field Ciudad" then
 										for j = 1, #fields[i] do
 										fields[i][j].active = false
 										fields[i][j]:setFillColor(0.8)
